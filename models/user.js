@@ -34,6 +34,37 @@ user_schema.pre('save', function(next) {
     });
 });
 
+//check
+var send_confkey = function(user_email){
+	var conf_key = Math.floor(Math.random()*90000) + 10000
+	// create reusable transport method (opens pool of SMTP connections)
+	var smtpTransport = nodemailer.createTransport("SMTP",{
+		service: "Gmail",
+		auth: {
+			user: "netpproject@gmail.com",
+			pass: "iambatman1"
+		}
+	});
+	
+	// setup e-mail data with unicode symbols
+	var mailOptions = {
+		from: "netpproject@gmail.com", // sender address
+		to: user_email, // list of receivers
+		subject: "Reg for ProSHare", // Subject line
+		text: "Hello. Access key for " + user_email + " is " + conf_key, // plaintext body
+	}
+	
+	// send mail with defined transport object
+	smtpTransport.sendMail(mailOptions, function(error, response){
+		if(error){
+			console.log(error);
+		}else{
+			console.log("Message sent: " + response.message);
+		}
+	});
+	return conf_key
+}
+
 // user_schema.methods.compare_password = function(candidatePassword, cb) {
 // 		bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
 //         if (err) return cb(err);
@@ -57,7 +88,7 @@ user_schema.statics.create_user = function(user_info, callback){
 		branch : user_info.branch,
 		bitsid : user_info.bitsid,
 		admin_status : [],
-		conf_key : Math.floor(Math.random()*90000) + 10000,
+		conf_key : send_confkey(email),
 		created_at : moment().unix(),
 		updated_at : moment().unix()
 	})
@@ -71,34 +102,8 @@ user_schema.statics.create_user = function(user_info, callback){
 			return
 		}
 	})
-	// use nodemailer
-	// create reusable transport method (opens pool of SMTP connections)
-	var smtpTransport = nodemailer.createTransport("SMTP",{
-		service: "Gmail",
-		auth: {
-			user: "netpproject@gmail.com",
-			pass: "iambatman1"
-		}
-	});
-	
-	// setup e-mail data with unicode symbols
-	var mailOptions = {
-		from: "netpproject@gmail.com", // sender address
-		to: new_user.email, // list of receivers
-		subject: "Reg for ProSHare", // Subject line
-		text: "Hello. Access key for " + new_user.email + " is " + new_user.conf_key, // plaintext body
-	}
-	
-	// send mail with defined transport object
-	smtpTransport.sendMail(mailOptions, function(error, response){
-		if(error){
-			console.log(error);
-		}else{
-			console.log("Message sent: " + response.message);
-		}
-	});
 };
-
+//check twice
 user_schema.statics.compare_conf_key = function(request, bitsid, callback){
 	var conf_key = request.conf_key
 	User.findOne({"bitsid" : bitsid}, function(err, user){
@@ -106,9 +111,11 @@ user_schema.statics.compare_conf_key = function(request, bitsid, callback){
 		else if(!user) callback(new Error("User not found in db."), null)
 		else{
 			if(user.conf_key != conf_key){
-				user.remove('user', function(err){
-					if(err) callback(new Error("TMKC"), null)
-					else callback(new Error("MKL, Incorrect conf key. Give post req to /users for registering again"), null)
+				var conf_key_new = send_confkey(user.email)
+				user.conf_key = conf_key_new
+				user.save(function(err){
+					if(err) callback(new Error("Error in connection with db"), null)
+					callback(new Error("Incorrect confkey. New conf key sent to your email"), null)
 				})
 			} 
 			else{
