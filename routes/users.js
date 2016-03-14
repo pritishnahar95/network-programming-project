@@ -1,5 +1,6 @@
-var express = require('express');
-var router = express.Router();
+var express = require('express')
+var router = express.Router()
+var mongoose = require('mongoose')
 var User = require('../models/user')
 
 router.post('/', function(req, res){
@@ -12,6 +13,7 @@ router.post('/', function(req, res){
         response = {'error' : true, 'message' : "User already registered."}
       }
       else {
+        console.log(err)
         code = 400
         response = {'error' : true, 'message' : err.message}
       }
@@ -23,20 +25,21 @@ router.post('/', function(req, res){
   })
 })
 
-// router.post('/confkey/:bitsid',function(req,res){
-//   var response = {}
-//   var code = 200
-//   var bitsid = req.params.bitsid
-//   //console.log(bitsid)
-//   User.compare_conf_key(req.body, bitsid, function(err, conf){
-//     if(err){
-//       code = 400
-//       response = {'error' : true, 'message' : "Your data deleted. Go to http://localhost/users/ to fill in your data."}
-//     }
-//     else{
-//       response = {'error' : false, 'message' : "Your account activated."}
-//     }
-//   })
-// })
+router.post('/confkey/:bitsid',function(req,res){
+  var response = {}
+  var code = 200
+  console.log
+  var bitsid = req.params.bitsid
+  User.compare_conf_key(req.body, bitsid, function(err, user){
+    if(err){
+      code = 400
+      response = {'error' : true, 'message' : err.message}
+    }
+    else{
+      response = {'error' : false, 'message' : "Your account activated."}
+    }
+    res.status(code).json(response)
+  })
+})
 
 module.exports = router;

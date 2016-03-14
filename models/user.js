@@ -4,11 +4,7 @@ var moment = require('moment')
 var Project = require('./project')
 var bcrypt = require('bcrypt')
 var nodemailer = require('nodemailer')
-
-
-
 var SALT_WORK_FACTOR = 10;
-
 
 var user_schema = new mongoose.Schema({
 	username : {type: String},
@@ -52,10 +48,12 @@ user_schema.pre('save', function(next) {
 
 // Create operation.
 user_schema.statics.create_user = function(user_info, callback){
+	var bitsid = user_info.bitsid
+	var email = "f" + bitsid.substring(0,4) + bitsid.substring(8,11) + "@goa.bits-pilani.ac.in"
 	var new_user = new User({
 		username : user_info.username,
 		password : user_info.password,
-		email : user_info.email,
+		email : email,
 		branch : user_info.branch,
 		bitsid : user_info.bitsid,
 		admin_status : [],
@@ -101,28 +99,28 @@ user_schema.statics.create_user = function(user_info, callback){
 	});
 };
 
-// user_schema.statics.compare_conf_key = function(conf_key, bitsid, callback){
-	
-// 	var user = User.findOne({"bitsid" : bitsid}).exec()
-// 	//console.log(user)	- error
-// 	if (user.conf_key == conf_key){
-// 		user.active = true
-// 		user.save(function(err, user){
-// 			if(err){
-// 				callback(err, null)
-// 			}
-// 			else if(user){ 
-// 				callback(null, user)
-// 			}
-// 		})
-
-// 	}
-// 	else{
-// 		User.remove({"bitsid" : bitsid}).exec()
-// 		callback(err, null)
-// 	}
-// }
-
+user_schema.statics.compare_conf_key = function(request, bitsid, callback){
+	var conf_key = request.conf_key
+	User.findOne({"bitsid" : bitsid}, function(err, user){
+		if(err) callback(new Error("Error in connection with database."), null)
+		else if(!user) callback(new Error("User not found in db."), null)
+		else{
+			if(user.conf_key != conf_key){
+				user.remove('user', function(err){
+					if(err) callback(new Error("TMKC"), null)
+					else callback(new Error("MKL, Incorrect conf key. Give post req to /users for registering again"), null)
+				})
+			} 
+			else{
+				user.active = true
+				user.save(function(err){
+					if(err) callback(new Error("Error in activating your profile."), null)
+					callback(null, user)
+				})
+			}		
+		}
+	})
+}
 
 // for convenience, keep entire mongoose user model in a variable named User.
 var User = mongoose.model('User', user_schema)
