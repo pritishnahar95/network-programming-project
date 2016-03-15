@@ -28,7 +28,6 @@ router.post('/', function(req, res){
 router.post('/confkey/:bitsid',function(req,res){
   var response = {}
   var code = 200
-  console.log
   var bitsid = req.params.bitsid
   User.compare_conf_key(req.body, bitsid, function(err, user){
     if(err){

@@ -20,7 +20,7 @@ var user_schema = new mongoose.Schema({
 	updated_at : {type : Number},
 })
 
-//write comment
+// Function will execute before saving the user object for hashing the password entered by the user. 
 user_schema.pre('save', function(next) {
     var user = this;
     if (!user.isModified('password')) return next();
@@ -34,18 +34,19 @@ user_schema.pre('save', function(next) {
     });
 });
 
-//check
+// Mail sending option - reusabel - for nodemailer.
+var smtpTransport = nodemailer.createTransport("SMTP",{
+	service: "Gmail",
+	auth: {
+		user: "netpproject@gmail.com",
+		pass: "iambatman1"
+	}
+});
+
 var send_confkey = function(user_email){
+	// Generate a confirmation key everytime this function is called.
 	var conf_key = Math.floor(Math.random()*90000) + 10000
-	// create reusable transport method (opens pool of SMTP connections)
-	var smtpTransport = nodemailer.createTransport("SMTP",{
-		service: "Gmail",
-		auth: {
-			user: "netpproject@gmail.com",
-			pass: "iambatman1"
-		}
-	});
-	
+
 	// setup e-mail data with unicode symbols
 	var mailOptions = {
 		from: "netpproject@gmail.com", // sender address
