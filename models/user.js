@@ -35,13 +35,7 @@ user_schema.pre('save', function(next) {
 });
 
 // Mail sending option - reusabel - for nodemailer.
-var smtpTransport = nodemailer.createTransport("SMTP",{
-	service: "Gmail",
-	auth: {
-		user: "netpproject@gmail.com",
-		pass: "iambatman1"
-	}
-});
+var transporter = nodemailer.createTransport('smtps://netpproject%40gmail.com:iambatman1@smtp.gmail.com');
 
 var send_confkey = function(user_email){
 	// Generate a confirmation key everytime this function is called.
@@ -56,7 +50,7 @@ var send_confkey = function(user_email){
 	}
 	
 	// send mail with defined transport object
-	smtpTransport.sendMail(mailOptions, function(error, response){
+	transporter.sendMail(mailOptions, function(error, response){
 		if(error){
 			console.log(error);
 		}else{
@@ -78,7 +72,7 @@ var send_confkey = function(user_email){
 
 // CRUD operation in user db
 
-// Create operation.
+// Create new user - generate confirmation key and send mail.
 user_schema.statics.create_user = function(user_info, callback){
 	var bitsid = user_info.bitsid
 	var email = "f" + bitsid.substring(0,4) + bitsid.substring(8,11) + "@goa.bits-pilani.ac.in"
@@ -104,6 +98,7 @@ user_schema.statics.create_user = function(user_info, callback){
 		}
 	})
 };
+
 //check twice
 user_schema.statics.compare_conf_key = function(request, bitsid, callback){
 	var conf_key = request.conf_key
