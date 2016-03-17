@@ -4,10 +4,11 @@ var moment = require('moment')
 var Project = require('./project')
 var bcrypt = require('bcrypt')
 var nodemailer = require('nodemailer')
-var SALT_WORK_FACTOR = 10;
+var SALT_WORK_FACTOR = 10; 
+var jwt = require('jsonwebtoken')
 
 var user_schema = new mongoose.Schema({
-	username : {type: String},
+	username : {type: String, unique: true},
 	password : {type: String},
 	email : {type: String, unique: true},
 	branch : {type: String},
@@ -36,7 +37,6 @@ user_schema.pre('save', function(next) {
 
 // Mail sending option - reusabel - for nodemailer.
 var transporter = nodemailer.createTransport('smtps://netpproject%40gmail.com:iambatman1@smtp.gmail.com');
-
 var send_confkey = function(user_email){
 	// Generate a confirmation key everytime this function is called.
 	var conf_key = Math.floor(Math.random()*90000) + 10000
@@ -60,12 +60,36 @@ var send_confkey = function(user_email){
 	return conf_key
 }
 
-// user_schema.methods.compare_password = function(candidatePassword, cb) {
-// 		bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
-//         if (err) return cb(err);
-//         return cb(null, isMatch);
-//     });
-// };
+var send_pwd = function(user_email){
+	// Generate a confirmation key everytime this function is called.
+	var pwd = Math.floor(Math.random()*9000000) + 1000000
+
+	// setup e-mail data with unicode symbols
+	var mailOptions = {
+		from: "netpproject@gmail.com", // sender address
+		to: user_email, // list of receivers
+		subject: "Reg for ProSHare", // Subject line
+		text: "Hello. New password for " + user_email + " is " + pwd, // plaintext body
+	}
+	
+	// send mail with defined transport object
+	transporter.sendMail(mailOptions, function(error, response){
+		if(error){
+			console.log(error);
+		}else{
+			console.log("Message sent: " + response.message);
+		}
+	});
+	return pwd
+}
+
+
+user_schema.methods.compare_password = function(candidatePassword, cb) {
+		bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
+        if (err) return cb(err, null);
+        return cb(null, isMatch);
+    });
+};
 
 
 //---------------------------//
@@ -124,6 +148,63 @@ user_schema.statics.compare_conf_key = function(request, bitsid, callback){
 		}
 	})
 }
+
+// user login
+user_schema.statics.login = function(request, callback){
+  User.findOne({"username": request.username}, function(err, user){
+      if(err){
+        return callback(new Error("Error in connection with db."), null)
+      }
+      else{
+        if(!user){
+          return callback(new Error("User not found in db."), null);
+        }
+        else{
+          user.compare_password(request.password, function(err, isMatch){
+            if(err){
+              return callback(err, null);
+			}
+            else{
+              if(isMatch){
+				return callback(null, user)
+              }
+              else{
+                return callback(new Error("Incorrect password"), null)
+              }
+            }
+          });
+        }
+      }
+     });
+};
+
+// forgot pwd
+user_schema.statics.forgot_password = function(request,callback){
+	User.findOne({"username": request.username}, function(err, user){
+		if(err){
+			return callback(err, null);
+		}
+		else{
+			if(!user){
+				return callback(new Error("User not found in db."), null)
+			}
+			else{
+				var pwd = send_pwd(user.email);
+				user.password = pwd;
+				user.save(function(err, user){
+					if(err){
+						callback(err, null)
+						return
+					}
+					else if(user){
+						callback(null, user)
+						return
+					}
+				});
+			}
+		}	
+	});
+};
 
 // for convenience, keep entire mongoose user model in a variable named User.
 var User = mongoose.model('User', user_schema)
