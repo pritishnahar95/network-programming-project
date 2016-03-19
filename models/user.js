@@ -14,11 +14,22 @@ var user_schema = new mongoose.Schema({
 	branch : {type: String},
 	bitsid : {type: String, unique: true},
 	conf_key : {type: Number, default: 0},
-	active : {type: Boolean, default:false},	
+	active : {type: Boolean, default:false},
+	
+	// user admin status for projects	
 	admin_status : [{type : mongoose.Schema.ObjectId, ref : 'Project'}],
+	
 	//member status
+	member : [{type : mongoose.Schema.ObjectId, ref : 'Project'}],
+	
 	created_at : {type : Number},
 	updated_at : {type : Number},
+	
+	//user has sent the request to join a project
+	outgoing_project_requests : [{type : mongoose.Schema.ObjectId, ref : 'Project'}],
+	
+	// incoming requests storage
+	incoming_project_invites : [{type : mongoose.Schema.ObjectId, ref : 'Project'}]
 })
 
 // Function will execute before saving the user object for hashing the password entered by the user. 
@@ -205,6 +216,175 @@ user_schema.statics.forgot_password = function(request,callback){
 		}	
 	});
 };
+
+// utility functions
+user_schema.statics.is_member = function(userid, projectid){
+	User.findOne({"_id" : userid}, function(err, user){
+		//var flag = 0
+		if(err) {
+			console.log("Error in db")
+			return 0
+		}
+		else if(!user) {
+			console.log("user not found")
+			return 0
+		}
+		else{
+			for(var i=0; i<user.member.length; i++){
+				if(projectid == user.member[i]) return 1
+			}
+			return 0
+		}
+	})
+}
+
+user_schema.statics.is_admin = function(userid, projectid){
+	User.findOne({"_id" : userid}, function(err, user){
+		//var flag = 0
+		if(err) {
+			console.log("Error in db")
+			return 0
+		}
+		else if(!user) {
+			console.log("user not found")
+			return 0
+		}
+		else{
+			for(var i=0; i<user.admin_status.length; i++){
+				if(projectid == user.admin_status[i]) return 1
+			}
+		}
+		return 0
+	})
+}
+
+user_schema.statics.save_incoming_project_invites = function(userid, projectid){
+	User.findOne({"_id" : userid}, function(err, user){
+		if(err) {
+			console.log("Error in db")
+			return 0
+		}
+		else if(!user) {
+			console.log("user not found")
+			return 0
+		}
+		else{
+			user.incoming_project_invites.push(projectid)
+			user.save(function(err, user){
+				if(err){
+					console.log("error in saving")
+					return 0
+				}
+				else if(user){
+					return 1
+				}
+			});
+		}
+	})
+}
+
+user_schema.statics.save_admin_status = function(userid, projectid){
+	User.findOne({"_id" : userid}, function(err, user){
+		if(err) {
+			console.log("Error in db")
+			return
+		}
+		else if(!user) {
+			console.log("user not found")
+			return
+		}
+		else{
+			user.admin_status.push(projectid)
+			user.save(function(err, user){
+				if(err){
+					console.log("error in saving")
+					return
+				}
+				else if(user){
+					return
+				}
+			});
+		}
+	})
+}
+
+user_schema.statics.acceptinvite = function(projectid, userid, decision, callback){
+	User.findOne({"_id" : userid}, function(err,user){
+		if(err){
+			callback(new Error("Error in db"), null)
+		}
+		else if(!user){
+			callback(new Error("User not found in invite function"), null)
+		}
+		else{
+			var ind = user.incoming_project_invites.indexOf(projectid)
+			user.incoming_project_invites.splice(ind, 1)
+			if(decision == 1){
+				user.member.push(projectid)
+				user.save(function(err, user){
+					if(err){
+						callback(new Error("error in saving"), null)
+					}
+					else{
+						callback(null, user)
+					}
+				});
+			}
+		}
+	})
+}
+
+
+user_schema.statics.sendrequest = function(userid, projectid, callback){
+	// add request user to users pending_request array
+	User.findOne({"_id" : userid}, function(err, user){
+		if(err){
+			callback(new Error("Database connection error"), null)
+		}
+		else if(!user){
+			callback(new Error("user not found in db"), null)
+		}
+		else{
+			user.outgoing_project_requests.push(projectid)
+			user.save(function(err,user){
+				if(err){
+					callback(err,null)
+					return
+				}
+				else if(user){
+					callback(null,user)
+					return
+				}
+			})				
+		}
+	})
+}
+
+user_schema.statics.addprojectmembership = function(userid, projectid, callback){
+	User.findOne({"_id" : userid}, function(err, user){
+		if(err){
+			callback(new Error("error in connection"), null)
+		}
+		else if(!user){
+			callback(new Error("user not found in db"), null)
+		}
+		else{
+			var ind = user.outgoing_project_requests.indexOf(projectid)
+			user.outgoing_project_requests.splice(ind, 1)
+			user.member.push(projectid)
+			user.save(function(err,user){
+				if(err){
+					callback(new Error("Error in saving"), null)
+				}
+				else if(user){
+					callback(null, user)
+				}
+			})				
+		}
+	})
+}
+
+
 
 // for convenience, keep entire mongoose user model in a variable named User.
 var User = mongoose.model('User', user_schema)

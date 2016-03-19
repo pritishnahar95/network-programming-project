@@ -9,7 +9,8 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var projects = require('./routes/projects');
 var app = express();
-var prootected = require('./routes/protected')
+var projects_protected = require('./routes/projects_protected')
+var users_protected = require('./routes/users_protected')
 // connection to database made
 require('./config/db')
 
@@ -57,9 +58,8 @@ app.use(function(req, res, next) {
     
   }
 });
-app.use('/protected', prootected)
-
-
+app.use('/projects', projects_protected)
+app.use('/users', users_protected)
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
