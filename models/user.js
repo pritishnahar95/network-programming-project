@@ -8,7 +8,8 @@ var SALT_WORK_FACTOR = 10;
 var jwt = require('jsonwebtoken')
 
 var user_schema = new mongoose.Schema({
-	username : {type: String, unique: true},
+	// _id = username
+	_id : {type: String, unique: true},
 	password : {type: String},
 	email : {type: String, unique: true},
 	branch : {type: String},
@@ -17,10 +18,10 @@ var user_schema = new mongoose.Schema({
 	active : {type: Boolean, default:false},
 	
 	// user admin status for projects	
-	admin_status : [{type : mongoose.Schema.ObjectId, ref : 'Project'}],
+	admin_status : [{type: String, ref: 'Project',unique: true}],
 	
 	//member status
-	member : [{type : mongoose.Schema.ObjectId, ref : 'Project'}],
+	member : [{type : mongoose.Schema.ObjectId, ref : 'Project', unique: true}],
 	
 	created_at : {type : Number},
 	updated_at : {type : Number},
@@ -94,7 +95,6 @@ var send_pwd = function(user_email){
 	return pwd
 }
 
-
 user_schema.methods.compare_password = function(candidatePassword, cb) {
 		bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
         if (err) return cb(err, null);
@@ -112,7 +112,7 @@ user_schema.statics.create_user = function(user_info, callback){
 	var bitsid = user_info.bitsid
 	var email = "f" + bitsid.substring(0,4) + bitsid.substring(8,11) + "@goa.bits-pilani.ac.in"
 	var new_user = new User({
-		username : user_info.username,
+		_id : user_info.username,
 		password : user_info.password,
 		email : email,
 		branch : user_info.branch,
@@ -122,31 +122,28 @@ user_schema.statics.create_user = function(user_info, callback){
 		created_at : moment().unix(),
 		updated_at : moment().unix()
 	})
-	new_user.save(function(err, user){
-		if(err){
-			callback(err, null)
-			return
-		}
-		else if(user){
-			callback(null, user)
-			return
-		}
+	var promise = new_user.save()
+	promise.then(function(user){
+		if(!user) throw new Error("Error in saving.")
+		callback(null, user)
+	})
+	.catch(function(err){
+		callback(err, null)
 	})
 };
 
-//check twice
-user_schema.statics.compare_conf_key = function(request, bitsid, callback){
-	var conf_key = request.conf_key
-	User.findOne({"bitsid" : bitsid}, function(err, user){
+user_schema.statics.compare_conf_key = function(conf_key, username, callback){
+	User.findOne({"_id" : username}, function(err, user){
 		if(err) callback(new Error("Error in connection with database."), null)
 		else if(!user) callback(new Error("User not found in db."), null)
 		else{
+			if(user.active) callback(new Error("User activation process already done."), null)
 			if(user.conf_key != conf_key){
 				var conf_key_new = send_confkey(user.email)
 				user.conf_key = conf_key_new
 				user.save(function(err){
-					if(err) callback(new Error("Error in connection with db"), null)
-					callback(new Error("Incorrect confkey. New conf key sent to your email"), null)
+					if(err) callback(new Error("Error in connection with database."), null)
+					callback(new Error("Incorrect confirmation key. New coconfirmationnf key sent to your email."), null)
 				})
 			} 
 			else{
@@ -162,36 +159,36 @@ user_schema.statics.compare_conf_key = function(request, bitsid, callback){
 
 // user login
 user_schema.statics.login = function(request, callback){
-  User.findOne({"username": request.username}, function(err, user){
+  User.findOne({"_id": request.username}, function(err, user){
       if(err){
-        return callback(new Error("Error in connection with db."), null)
+        callback(new Error("Error in connection with db."), null)
       }
       else{
         if(!user){
-          return callback(new Error("User not found in db."), null);
+          callback(new Error("User not found in db."), null);
         }
         else{
           user.compare_password(request.password, function(err, isMatch){
             if(err){
-              return callback(err, null);
+              callback(err, null);
 			}
             else{
               if(isMatch){
-				return callback(null, user)
+				callback(null, user)
               }
               else{
-                return callback(new Error("Incorrect password"), null)
+                callback(new Error("Incorrect password"), null)
               }
             }
           });
         }
       }
-     });
+	});
 };
 
 // forgot pwd
 user_schema.statics.forgot_password = function(request,callback){
-	User.findOne({"username": request.username}, function(err, user){
+	User.findOne({"_id": request.username}, function(err, user){
 		if(err){
 			return callback(err, null);
 		}
@@ -283,27 +280,25 @@ user_schema.statics.save_incoming_project_invites = function(userid, projectid){
 	})
 }
 
-user_schema.statics.save_admin_status = function(userid, projectid){
+// admin_status unique not working
+user_schema.statics.save_admin_status = function(userid, project_title, callback){
 	User.findOne({"_id" : userid}, function(err, user){
 		if(err) {
-			console.log("Error in db")
-			return
+			callback(new Error("Error in connection with user database."), null);
 		}
 		else if(!user) {
-			console.log("user not found")
-			return
+			callback(new Error("User not found in database."), null);
 		}
 		else{
-			user.admin_status.push(projectid)
-			user.save(function(err, user){
-				if(err){
-					console.log("error in saving")
-					return
-				}
-				else if(user){
-					return
-				}
-			});
+			user.admin_status.push(project_title)
+			var promise = user.save()
+			promise.then(function(user){
+				if(!user) throw new Error("Error in saving project title in user database.")
+				callback(null, user._id)
+			})
+			.catch(function(err){
+				callback(err, null)
+			})
 		}
 	})
 }

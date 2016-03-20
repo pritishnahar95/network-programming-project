@@ -3,13 +3,15 @@ var User = require('./user')
 var moment = require('moment')
 mongoose.Promise = require('bluebird')
 
-
 var project_schema = new mongoose.Schema({
-	tags : [{type: String}],
-	title : {type: String, unique : true},
+	// _id = title
+	_id : {type: String, unique : true},
 	description : {type: String},
-	admin : [{type : mongoose.Schema.Types.ObjectId, ref : 'User',unique : true}],
-	members : [{type : mongoose.Schema.Types.ObjectId, ref : 'User',unique : true}],
+	admin : [{type : String, ref : 'User',unique : true}],
+	members : [{type : String, ref : 'User',unique : true}],
+	
+	tags : [{type: String}],
+	branch : [{type : String}],
 	
 	// object ids of users who have not accepted the request to join the project
 	users_invited : [{type : mongoose.Schema.Types.ObjectId, ref : 'User',unique : true}],
@@ -33,63 +35,91 @@ project_schema.statics.find_all = function(callback){
 }
 
 project_schema.statics.create_project = function(project_info, userid, callback){
-	
-	
-	var new_project = new Project({
-		tags : project_info.tags,
-		title : project_info.title,
-		description : project_info.description,
-		//members : [],
-		created_at : moment().unix(),
-		updated_at : moment().unix()
+	User.save_admin_status(userid, project_info.title, function(err, user){
+		if(err) callback(err, null)
+		else{
+			var new_project = new Project({
+				tags : project_info.tags,
+				branch :project_info.branch,
+				_id : project_info.title,
+				description : project_info.description,
+				//members : [],
+				created_at : moment().unix(),
+				updated_at : moment().unix()
+			})
+			new_project.admin.push(userid)
+			// discuss
+			//new_project.members.push(userid)
+			var promise = new_project.save()
+			promise.then(function(user){
+				if(!new_project) throw new Error("Error in saving username in project database.")
+				callback(null, new_project)
+			})
+			.catch(function(err){
+				callback(err, null)
+			})	
+		}
 	})
-	
-	new_project.admin.push(userid)
-	try{
-		new_project.save(function(err, project){
-			if(err){
-				callback(new Error("Database Connection Error"),null)
-			}
-			else{
-				callback(null,project._id)
-			}
-		})
-	}
-	catch(error){
-		callback(error, null)
-	}
-
-		
 };
 
-//TODO
+// we cannont edit _id field of mongo
+// so create new project everytime
+// and remove old one
 project_schema.statics.edit_project = function(projectinfo, projectid, userid, callback){
-
-	Project.findOne({"_id":projectid},function(err, project){
+	Project.findOne({"_id":projectid}, function(err, project){
 		if(err){
-			callback(new Error("Database error"),null)
+			callback(new Error("Database connection error."),null)
 		}
 		else if(!project){
-			callback(new Error("No project in Database"),null)
+			callback(new Error("No project in database"),null)
 		}
 		else{
-			project.description = projectinfo.description
-			project.title = projectinfo.title
-			project.save(function(err,project){
-				if(err){
-					callback(err,null)
-					return
+			var flag = false
+			for(var i=0 ; i<project.admin.length ; i++){
+				if(userid == project.admin[i]){
+					flag = true
+					break
 				}
-				else if(project){
-					callback(null,project)
-					return
-				}
-			})				
-			
+			}
+			if(flag){
+				var new_project = new Project({
+					tags : project.tags,
+					branch :project.branch,
+					_id : projectinfo.title,
+					description : projectinfo.description,
+					//members : [],
+					admin : project.admin,
+					members : project.member,
+					users_invited : project.users_invited,
+					users_requesting : project.users_requesting,
+					created_at : project.created_at,
+					updated_at : project.updated_at
+				})
+				
+				// remove project 
+				
+				Project.remove({ "_id": projectid }, function(err) {
+					if (err) {
+						callback(err, null)
+					}
+					else{
+						//save inside callback \m/
+						var promise = new_project.save()
+						promise.then(function(user){
+							if(!new_project) throw new Error("Error in updating project database.")
+							callback(null, new_project)
+						})
+						.catch(function(err){
+							callback(err, null)
+						})
+					}
+				});							
+			}
+			else{
+				callback(new Error("No access to edit the project"), null)
+			}				
 		}
 	})
-	
-
 };
 
 

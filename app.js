@@ -6,11 +6,11 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var jwt = require('jsonwebtoken')
 var routes = require('./routes/index');
+var app = express();
+
 var users = require('./routes/users');
 var projects = require('./routes/projects');
-var app = express();
-var projects_protected = require('./routes/projects_protected')
-var users_protected = require('./routes/users_protected')
+
 // connection to database made
 require('./config/db')
 
@@ -27,8 +27,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/users', users);
-app.use('/projects', projects);
 app.use(function(req, res, next) {
   // check header or url parameters or post parameters for token
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
@@ -58,8 +56,10 @@ app.use(function(req, res, next) {
     
   }
 });
-app.use('/projects', projects_protected)
-app.use('/users', users_protected)
+
+app.use('/projects', projects);
+app.use('/users', users);
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');

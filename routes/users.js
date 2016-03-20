@@ -5,80 +5,70 @@ var User = require('../models/user')
 var jwt = require('jsonwebtoken')
 
 // Function to generate tokens.
-var get_token = function(user){
-	return jwt.sign(user, "qwerty", {expiresIn: 144000})
-}
 
-router.post('/', function(req, res){
+//User accepts/rejects project invite
+router.put('/acceptinvite/:projectid/:userid_invitedtuser/:decision', function(req,res){
   var response = {}
   var code = 200
-  User.create_user(req.body, function(err, user){
-    if(err){
-      if(err.code == 11000) {
-        code = 11000
-        response = {'error' : true, 'message' : "User already registered."}
-      }
-      else {
-        console.log(err)
-        code = 400
-        response = {'error' : true, 'message' : err.message}
-      }
-    }
-    else{
-      response = {'error' : false, 'message' : "User created successfully."}
-    }
-    res.status(code).json(response)
-  })
-})
-
-router.post('/confkey/:bitsid',function(req,res){
-  var response = {}
-  var code = 200
-  var bitsid = req.params.bitsid
-  User.compare_conf_key(req.body, bitsid, function(err, user){
+  var projectid = req.params.projectid
+  var userid_invitedtuser = req.params.userid_invitedtuser
+  var decision = req.params.decision
+  
+ // console.log(projectid)
+  
+  User.acceptinvite(projectid, userid_invitedtuser, decision, function(err, user){
     if(err){
       code = 400
-      response = {'error' : true, 'message' : err.message}
+      response = {'error' : true , 'message' : err.message}
     }
     else{
-      var token = get_token(user)
-      // generate token and send in the response
-      // console.log(token)
-      response = {'error' : false, 'message' : "Your account activated.", "token" : token}
+      Project.addmember(projectid, userid_invitedtuser, function(err, project){
+        if(err){
+          code = 400
+          response = {'error' : true, 'message' : err.message}
+        }
+        else{
+          response = {'error' : false, 'message' : "action taken successfully"}
+        }
+        res.status(code).json(response)
+      })
     }
-    res.status(code).json(response)
-  })
-})
+  })  
 
-router.post('/login', function(req, res){
+})
+//////////////////////
+router.put('/sendrequest/:projectid/:userid/', function(req,res){
   var response = {}
   var code = 200
-  User.login(req.body, function(err, user){
-    if(err){
-      code = 400
-      response = {'error' : true, 'message' : err.message}
-    }
-    else{
-      var token = get_token(user)
-      response = {'error' : false, 'message' : "User login successful.", "token" : token}
-    }
-    res.status(code).json(response)
-  })
-})
+  var projectid = req.params.projectid
+  var userid = req.params.userid
 
-router.post('/forgotpassword', function(req, res){
-  var response = {}
-  var code = 200
-  User.forgot_password(req.body, function(err, user){
-    if(err){
-      code = 400
-      response = {'error' : true, 'message' : err.message}
-    }
-    else{
-      response = {'error' : false, 'message' : "New password mailed."}
-    }
-    res.status(code).json(response)
-  })
+  var flag1 = User.is_member(userid, projectid)
+  if(flag1 == 1){
+    code = 400
+    response = {'error':true, message:"Already a member"}
+    res.status(code).json(response)    
+  }
+   else{
+      User.sendrequest(userid, projectid, function(err,user){   //user.sendrequest
+          if(err){
+            code = 400
+            response = {'error': true, 'message':err.message}     
+          }
+          else{ 
+            var flag3 = Project.save_users_requesting(userid,projectid)   //project.save_users
+            if(flag3 == 0){
+              response = {'error':true, 'message':"Something went wrong"}
+              res.status(code).json(response)       
+            }
+            else{
+               response = {'error':false, 'message':"Request sent to project"}
+               res.status(code).json(response)          
+            }
+          }  
+        }) 
+     }
+  
 })
 
 module.exports = router;
