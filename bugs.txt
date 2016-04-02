@@ -1,0 +1,3 @@
+while creating user - sending mail by wrong mechanism.
+when to use PUT and POST
+should there be some field in database which keeps a track of whether user is logged in or not.

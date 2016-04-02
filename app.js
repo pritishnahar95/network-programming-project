@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 var jwt = require('jsonwebtoken')
 var routes = require('./routes/index');
 var app = express();
-
+var User  = require('./models/user')
 var users = require('./routes/users');
 var projects = require('./routes/projects');
 
@@ -56,6 +56,17 @@ app.use(function(req, res, next) {
     
   }
 });
+
+// app.use(function(req, res, next){
+//   var username = req.body.username || req.params.username || req.query.username
+//   console.log(req.body)
+//   console.log(req.params)
+//   User.find({"username" : username}, function(err, user){
+//     if(err) res.json({"message" : "Error in connection with database"})
+//     else if(!user) res.json({"message" : "User not found."})
+//     else next()
+//   })
+// })
 
 app.use('/projects', projects);
 app.use('/users', users);

@@ -20,16 +20,18 @@ var jwt = require('jsonwebtoken')
 
 
 // Utility function for creating jwt tokens
-var get_token = function(user){
-	return jwt.sign(user, "qwerty", {expiresIn: 144000})
+var get_token = function(username){
+	return jwt.sign(username, "qwerty", {expiresIn: 1440})
 }
 
+// working
 router.get('/', function(req, res, next) {
   res.json({'message' : "Welcome to ProShare."});
 });
 
 // Routes for /projects
 
+//wokrking
 router.get('/projects', function(req, res){
 	var code = 200
 	var response = {}
@@ -95,19 +97,20 @@ router.get('/projects/:branch/:tag', function(req, res){
 router.post('/users/register', function(req, res){
   var response = {}
   var code = 200
-  User.create_user(req.body, function(err, user){
+  User.create_user(req.body, function(err, userid){
     if(err){
       code = 400
-      if(err.code = 11000) response = {'error' : true, 'message' : "Username already exist in database."}
-      else response = {'error' : true, 'message' : err.message}
+      response = {'error' : true, 'message' : err.message}
     }
     else{
-      response = {'error' : false, 'message' : "User created successfully."}
+      response = {'error' : false, 'message' : "User created successfully.", "userId" : userid}
     }
     res.status(code).json(response)
   })
 })
 
+// working
+// TODO - active flag to be included in db
 router.post('/users/confirmation/:username', function(req, res){
   var response = {}
   var code = 200
@@ -119,15 +122,15 @@ router.post('/users/confirmation/:username', function(req, res){
       response = {'error' : true, 'message' : err.message}
     }
     else{
-      var token = get_token(user)
+      var token = get_token(username)
       // generate token and send in the response
-      // console.log(token)
       response = {'error' : false, 'message' : "Your account activated.", "token" : token}
     }
     res.status(code).json(response)
   })
 })
 
+// working
 router.post('/users/login', function(req, res){
   var response = {}
   var code = 200
@@ -137,17 +140,18 @@ router.post('/users/login', function(req, res){
       response = {'error' : true, 'message' : err.message}
     }
     else{
-      var token = get_token(user)
+      var token = get_token(req.body.username)
       response = {'error' : false, 'message' : "User login successful.", "token" : token}
     }
     res.status(code).json(response)
   })
 })
 
-router.post('/users/forgotpassword', function(req, res){
+// doubt
+router.put('/users/forgotpassword/:username', function(req, res){
   var response = {}
   var code = 200
-  User.forgot_password(req.body, function(err, user){
+  User.forgot_password(req.params.username, function(err, user){
     if(err){
       code = 400
       response = {'error' : true, 'message' : err.message}

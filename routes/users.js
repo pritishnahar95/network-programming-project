@@ -1,9 +1,7 @@
 var express = require('express')
 var router = express.Router()
-var mongoose = require('mongoose')
 var User = require('../models/user')
-var jwt = require('jsonwebtoken')
-
+var Project = require('../models/project')
 // Function to generate tokens.
 
 //User accepts/rejects project invite
@@ -34,41 +32,30 @@ router.put('/acceptinvite/:projectid/:userid_invitedtuser/:decision', function(r
       })
     }
   })  
-
 })
-//////////////////////
-router.put('/sendrequest/:projectid/:userid/', function(req,res){
+
+// user is sending request to join a project
+// check if user is already a member of the project
+// if yes, send an error message
+// if no
+// push the projectid in outgoing_project_requests of user schema
+// push the user id in user_requesting array of project schema
+router.put('/sendrequest/:username/project/:projectpk', function(req,res){
   var response = {}
   var code = 200
-  var projectid = req.params.projectid
-  var userid = req.params.userid
+  var projectpk = req.params.projectpk
+  var username = req.params.username
 
-  var flag1 = User.is_member(userid, projectid)
-  if(flag1 == 1){
-    code = 400
-    response = {'error':true, message:"Already a member"}
-    res.status(code).json(response)    
-  }
-   else{
-      User.sendrequest(userid, projectid, function(err,user){   //user.sendrequest
-          if(err){
-            code = 400
-            response = {'error': true, 'message':err.message}     
-          }
-          else{ 
-            var flag3 = Project.save_users_requesting(userid,projectid)   //project.save_users
-            if(flag3 == 0){
-              response = {'error':true, 'message':"Something went wrong"}
-              res.status(code).json(response)       
-            }
-            else{
-               response = {'error':false, 'message':"Request sent to project"}
-               res.status(code).json(response)          
-            }
-          }  
-        }) 
-     }
-  
+  User.send_request(username, projectpk, function(err, data){
+    if(err){
+      code = 400
+      response = {'error' : true , 'message' : err.message}
+    }
+    else{
+      response = {'error' : false, 'message' : "action taken successfully", "data" : data}
+    }
+    res.status(code).json(response)
+  })
 })
 
 module.exports = router;

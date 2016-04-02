@@ -7,11 +7,11 @@ var User = require('../models/user')
 // add userid as admin in project's admin array.
 // add projectid in user's admin status array.
 // user's admin_status array has to be unique. not working
-router.post('/create/:userid', function(req, res){
+router.post('/create/:username', function(req, res){
   var response = {}
   var code = 200
-  var userid = req.params.userid
-  Project.create_project(req.body, userid, function(err, projectid){
+  var username = req.params.username
+  Project.create_project(req.body, username, function(err, projectid){
     if(err){
       response = {'error' : true, 'message' : err.message}
     }
@@ -25,14 +25,15 @@ router.post('/create/:userid', function(req, res){
 
 // check if user is the admin list of project.
 // if yes - save the edited project else send error message.
-router.put('/edit/:projectid/:userid', function(req,res){
+// TODO - edit the names from projectlist of all members and admin list of users. - IMP
+router.put('/edit/:projecttitle/:username', function(req,res){
   var response = {}
   var code = 200
-  var projectid = req.params.projectid
-  var userid = req.params.userid
+  var projecttitle = req.params.projecttitle
+  var username = req.params.username
   var projectinfo = req.body
   
-  Project.edit_project(projectinfo, projectid, userid, function(err, project){
+  Project.edit_project(projectinfo, projecttitle, username, function(err, project){
       if(err){
         code = 400
         response = {'error': true, 'message':err.message}
@@ -65,47 +66,22 @@ router.put('/addmember/:projectid/admin/:userid_admin/request/:userid_requestuse
 })
 
 //Project admin invites user
-router.put('/inviteuser/:projectid/admin/:userid_admin/invite/:userid_inviteduser', function(req,res){
+router.put('/inviteuser/:user_id/project/:project_id/admin/:admin_id', function(req,res){
   var response = {}
   var code = 200
-  var projectid = req.params.projectid
-  var userid_admin = req.params.userid_admin
-  var userid_inviteduser = req.params.userid_inviteduser
-  
-  var flag2 = User.is_admin(userid_admin, projectid)
-  if(flag2 == 0){
-    code = 400
-    response = {'error':true, message:"You dont have access to send invites"}
-    res.status(code).json(response)
-  }
-  else{
-    var flag1 = User.is_member(projectid,userid_inviteduser)
-    if(flag1 == 0){
+  var project_id = req.params.project_id
+  var admin_id = req.params.admin_id
+  var user_id = req.params.user_id
+    Project.send_invite(user_id, admin_id, project_id, function(err, data){
+    if(err){
       code = 400
-      response = {'error':true, message:"Already a member"}
-      res.status(code).json(response)    
+      response = {'error' : true , 'message' : err.message}
     }
     else{
-      Project.invitemember(projectid,userid_admin,userid_inviteduser, function(err,project){
-          if(err){
-            code = 400
-            response = {'error': true, 'message':err.message}     
-          }
-          else{
-            
-            var flag3 = User.save_incoming_project_invites(userid_inviteduser,projectid)
-            if(flag3 == 0){
-              response = {'error':true, 'message':"Something went wrong"}
-              res.status(code).json(response)       
-            }
-            else{
-               response = {'error':false, 'message':"Invite sent to member"}
-               res.status(code).json(response)          
-            }
-          }  
-        }) 
-     }
-  }
+      response = {'error' : false, 'message' : "action taken successfully", "data" : data}
+    }
+    res.status(code).json(response)
+  })
 })
 
 

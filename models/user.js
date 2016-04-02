@@ -1,58 +1,14 @@
-var mongoose = require('mongoose')
-mongoose.Promise = require('bluebird');
-var moment = require('moment')
-var Project = require('./project')
 var bcrypt = require('bcrypt')
 var nodemailer = require('nodemailer')
 var SALT_WORK_FACTOR = 10; 
-var jwt = require('jsonwebtoken')
-
-var user_schema = new mongoose.Schema({
-	// _id = username
-	_id : {type: String, unique: true},
-	password : {type: String},
-	email : {type: String, unique: true},
-	branch : {type: String},
-	bitsid : {type: String, unique: true},
-	conf_key : {type: Number, default: 0},
-	active : {type: Boolean, default:false},
-	
-	// user admin status for projects	
-	admin_status : [{type: String, ref: 'Project',unique: true}],
-	
-	//member status
-	member : [{type : mongoose.Schema.ObjectId, ref : 'Project', unique: true}],
-	
-	created_at : {type : Number},
-	updated_at : {type : Number},
-	
-	//user has sent the request to join a project
-	outgoing_project_requests : [{type : mongoose.Schema.ObjectId, ref : 'Project'}],
-	
-	// incoming requests storage
-	incoming_project_invites : [{type : mongoose.Schema.ObjectId, ref : 'Project'}]
-})
-
-// Function will execute before saving the user object for hashing the password entered by the user. 
-user_schema.pre('save', function(next) {
-    var user = this;
-    if (!user.isModified('password')) return next();
-    bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
-        if (err) return next(err);
-        bcrypt.hash(user.password, salt, function(err, hash) {
-            if (err) return next(err);
-             user.password = hash;
-            next();
-        });
-    });
-});
+var connection = require('../config/db').connection;
 
 // Mail sending option - reusabel - for nodemailer.
 var transporter = nodemailer.createTransport('smtps://netpproject%40gmail.com:iambatman1@smtp.gmail.com');
 var send_confkey = function(user_email){
 	// Generate a confirmation key everytime this function is called.
 	var conf_key = Math.floor(Math.random()*90000) + 10000
-
+	
 	// setup e-mail data with unicode symbols
 	var mailOptions = {
 		from: "netpproject@gmail.com", // sender address
@@ -60,7 +16,6 @@ var send_confkey = function(user_email){
 		subject: "Reg for ProSHare", // Subject line
 		text: "Hello. Access key for " + user_email + " is " + conf_key, // plaintext body
 	}
-	
 	// send mail with defined transport object
 	transporter.sendMail(mailOptions, function(error, response){
 		if(error){
@@ -95,292 +50,166 @@ var send_pwd = function(user_email){
 	return pwd
 }
 
-user_schema.methods.compare_password = function(candidatePassword, cb) {
-		bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
-        if (err) return cb(err, null);
-        return cb(null, isMatch);
-    });
-};
-
-
-//---------------------------//
-
-// CRUD operation in user db
-
-// Create new user - generate confirmation key and send mail.
-user_schema.statics.create_user = function(user_info, callback){
-	var bitsid = user_info.bitsid
-	var email = "f" + bitsid.substring(0,4) + bitsid.substring(8,11) + "@goa.bits-pilani.ac.in"
-	var new_user = new User({
-		_id : user_info.username,
-		password : user_info.password,
-		email : email,
-		branch : user_info.branch,
-		bitsid : user_info.bitsid,
-		admin_status : [],
-		conf_key : send_confkey(email),
-		created_at : moment().unix(),
-		updated_at : moment().unix()
-	})
-	var promise = new_user.save()
-	promise.then(function(user){
-		if(!user) throw new Error("Error in saving.")
-		callback(null, user)
-	})
-	.catch(function(err){
-		callback(err, null)
-	})
-};
-
-user_schema.statics.compare_conf_key = function(conf_key, username, callback){
-	User.findOne({"_id" : username}, function(err, user){
-		if(err) callback(new Error("Error in connection with database."), null)
-		else if(!user) callback(new Error("User not found in db."), null)
-		else{
-			if(user.active) callback(new Error("User activation process already done."), null)
-			if(user.conf_key != conf_key){
-				var conf_key_new = send_confkey(user.email)
-				user.conf_key = conf_key_new
-				user.save(function(err){
-					if(err) callback(new Error("Error in connection with database."), null)
-					callback(new Error("Incorrect confirmation key. New coconfirmationnf key sent to your email."), null)
-				})
-			} 
-			else{
-				user.active = true
-				user.save(function(err){
-					if(err) callback(new Error("Error in activating your profile."), null)
-					callback(null, user)
-				})
-			}		
-		}
-	})
-}
-
-// user login
-user_schema.statics.login = function(request, callback){
-  User.findOne({"_id": request.username}, function(err, user){
-      if(err){
-        callback(new Error("Error in connection with db."), null)
-      }
-      else{
-        if(!user){
-          callback(new Error("User not found in db."), null);
-        }
-        else{
-          user.compare_password(request.password, function(err, isMatch){
-            if(err){
-              callback(err, null);
-			}
-            else{
-              if(isMatch){
-				callback(null, user)
-              }
-              else{
-                callback(new Error("Incorrect password"), null)
-              }
-            }
-          });
-        }
-      }
-	});
-};
-
-// forgot pwd
-user_schema.statics.forgot_password = function(request,callback){
-	User.findOne({"_id": request.username}, function(err, user){
-		if(err){
-			return callback(err, null);
-		}
-		else{
-			if(!user){
-				return callback(new Error("User not found in db."), null)
-			}
-			else{
-				var pwd = send_pwd(user.email);
-				user.password = pwd;
-				user.save(function(err, user){
-					if(err){
-						callback(err, null)
-						return
-					}
-					else if(user){
-						callback(null, user)
-						return
-					}
+module.exports = {
+	create_user : function(request, callback){
+		var username = request.username;
+		var query = 'SELECT * FROM user_schema where username=' + "'" + username + "'" 
+		connection.query(query, function(err, users){
+			if (err) callback(err, null)
+			else if(users.length == 0){
+				var bitsid = request.bitsid
+				var email = "f" + bitsid.substring(0,4) + bitsid.substring(8,11) + "@goa.bits-pilani.ac.in"
+				var user = { 
+					username : request.username,
+					firstname : request.firstname,
+					lastname : request.lastname,
+					password  : "",
+					bitsid : request.bitsid,
+					email : email,
+					branch : request.branch,
+					conf_key : 0
+				};
+				// hash password.
+				var salt = bcrypt.genSaltSync(10);
+				user.password = bcrypt.hashSync(request.password, salt);
+				
+				user.conf_key = send_confkey(email);
+				connection.query('INSERT INTO user_schema SET ?', user, function(err, user){
+					if(err) callback(err, null);
+					else callback(null, user.insertId)
 				});
 			}
-		}	
-	});
-};
-
-// utility functions
-user_schema.statics.is_member = function(userid, projectid){
-	User.findOne({"_id" : userid}, function(err, user){
-		//var flag = 0
-		if(err) {
-			console.log("Error in db")
-			return 0
-		}
-		else if(!user) {
-			console.log("user not found")
-			return 0
-		}
-		else{
-			for(var i=0; i<user.member.length; i++){
-				if(projectid == user.member[i]) return 1
-			}
-			return 0
-		}
-	})
-}
-
-user_schema.statics.is_admin = function(userid, projectid){
-	User.findOne({"_id" : userid}, function(err, user){
-		//var flag = 0
-		if(err) {
-			console.log("Error in db")
-			return 0
-		}
-		else if(!user) {
-			console.log("user not found")
-			return 0
-		}
-		else{
-			for(var i=0; i<user.admin_status.length; i++){
-				if(projectid == user.admin_status[i]) return 1
-			}
-		}
-		return 0
-	})
-}
-
-user_schema.statics.save_incoming_project_invites = function(userid, projectid){
-	User.findOne({"_id" : userid}, function(err, user){
-		if(err) {
-			console.log("Error in db")
-			return 0
-		}
-		else if(!user) {
-			console.log("user not found")
-			return 0
-		}
-		else{
-			user.incoming_project_invites.push(projectid)
-			user.save(function(err, user){
-				if(err){
-					console.log("error in saving")
-					return 0
-				}
-				else if(user){
-					return 1
-				}
-			});
-		}
-	})
-}
-
-// admin_status unique not working
-user_schema.statics.save_admin_status = function(userid, project_title, callback){
-	User.findOne({"_id" : userid}, function(err, user){
-		if(err) {
-			callback(new Error("Error in connection with user database."), null);
-		}
-		else if(!user) {
-			callback(new Error("User not found in database."), null);
-		}
-		else{
-			user.admin_status.push(project_title)
-			var promise = user.save()
-			promise.then(function(user){
-				if(!user) throw new Error("Error in saving project title in user database.")
-				callback(null, user._id)
-			})
-			.catch(function(err){
+			else{
 				callback(err, null)
-			})
-		}
-	})
-}
-
-user_schema.statics.acceptinvite = function(projectid, userid, decision, callback){
-	User.findOne({"_id" : userid}, function(err,user){
-		if(err){
-			callback(new Error("Error in db"), null)
-		}
-		else if(!user){
-			callback(new Error("User not found in invite function"), null)
-		}
-		else{
-			var ind = user.incoming_project_invites.indexOf(projectid)
-			user.incoming_project_invites.splice(ind, 1)
-			if(decision == 1){
-				user.member.push(projectid)
-				user.save(function(err, user){
-					if(err){
-						callback(new Error("error in saving"), null)
-					}
-					else{
-						callback(null, user)
-					}
-				});
 			}
-		}
-	})
-}
-
-
-user_schema.statics.sendrequest = function(userid, projectid, callback){
-	// add request user to users pending_request array
-	User.findOne({"_id" : userid}, function(err, user){
-		if(err){
-			callback(new Error("Database connection error"), null)
-		}
-		else if(!user){
-			callback(new Error("user not found in db"), null)
-		}
-		else{
-			user.outgoing_project_requests.push(projectid)
-			user.save(function(err,user){
-				if(err){
-					callback(err,null)
-					return
+		})
+	},
+	
+	compare_conf_key : function(conf_key, username, callback){
+		var query = 'SELECT * FROM user_schema where username=' + "'" + username + "'" 
+		connection.query(query, function(err, users){
+			if(err) callback(err, null)
+			else if(users.length == 0) callback(new Error("No user found."), null)
+			else{
+				if(users[0].conf_key == conf_key) callback(null, users[0])
+				else {
+					users[0].conf_key = send_confkey(users[0].email);
+					var update_query = 'UPDATE user_schema SET conf_key=' + users[0].conf_key +' where username=' + "'" + username + "'"
+					connection.query(update_query, function(err, rows){
+						if(err) callback(err, null)
+						else callback (new Error("New confirmation key sent."), rows)
+ 					})
 				}
-				else if(user){
-					callback(null,user)
-					return
-				}
-			})				
-		}
-	})
-}
+			}
+		})
+	},
+	
+	login : function(request, callback){
+		var username = request.username;
+		var password = request.password;
+		var query = 'SELECT * FROM user_schema where username=' + "'" + username + "'" 
+		connection.query(query, function(err, users){
+			if(err) callback(err, null)
+			else if(users.length == 0) callback(new Error("Invalid username."), null)
+			else if(!bcrypt.compareSync(password, users[0].password)) callback(new Error("Invalid Password."), null)
+			else callback(null, users)
+		})
+	},
+	
+	forgot_password : function(username, callback){
+		var query = 'SELECT * FROM user_schema where username=' + "'" + username + "'"
+		connection.query(query, function(err, users){
+			if(err) callback(err, null)
+			else if(users.length == 0) callback(new Error("User not found."), null)
+			else{
+				var new_pwd = send_pwd(users[0].email)
+				// hash password.
+				var salt = bcrypt.genSaltSync(10);
+				var hashed_pwd = bcrypt.hashSync(new_pwd.toString(), salt);
+				var update_query = 'UPDATE user_schema SET password=' + "'" +hashed_pwd + "'" +' where username=' + "'" + username + "'"
+				connection.query(update_query, function(err, rows){
+					if(err) callback(err, null)
+					else callback (null, rows)
+				})
+			}
+		})
+	},
+	
+	send_request : function(username, project_pk, callback){
+		var user_query = 'SELECT * FROM user_schema where username=' + "'" + username + "'"
+		var project_query = 'SELECT * FROM project_schema where project_id=' + project_pk
+		connection.query(user_query + '; ' + project_query, function(err, data){
+			if(err) callback(err, null)
+			else if(data[0].length == 0 || data[1].length == 0) callback(new Error("User or project not found"), null)
+			else{
+				var member_query = 'SELECT * FROM member_schema where user_id='+ data[0][0].user_id + ' AND project_id='+ data[1][0].project_id
+				var request_query = 'SELECT * FROM request_schema where user_id='+ data[0][0].user_id + ' AND project_id='+ data[1][0].project_id				
+				connection.query(member_query + '; ' + request_query, function(err, memreq){
+					if(err) callback(err, null)
+					else if(memreq[0].length != 0 || memreq[1].length != 0) callback(new Error("Invalid request"), null)
+					else{
+						var request_user = {
+							project_id : data[1][0].project_id ,
+							user_id : data[0][0].user_id ,
+							sender_status : 0
+						};
+						connection.query('INSERT INTO request_schema SET ?', request_user, function(err, request_user){
+								if(err) callback(err, null);
+								else callback(null, request_user.insertId)
+						});
+					}
+				})
+			}
+		})
+	}
+};
+8
+/*
+check if user id is in the db - done
+project id in db - done
+check if (userid, projectid) exists in member schema or request schema
+userid , project insert in request schema.
+*/
+// // 	//User.findOne({"_id" : userid}, function(err, user){
+		
+// // 		// if(err){
+// // 		// 	callback(new Error("Database connection error."), null)
+// // 		// }
+// // 		// else if(!user){
+// // 		// 	callback(new Error("User not found in database."), null)
+// // 		// }
+// // 		// else{
+// // 		// 	var flag = false
+// // 		// 	// check member status
+// // 		// 	for(var i=0 ; i<user.member_status.length ; i++){
+// // 		// 		if(projectid == user.member_status[i]){
+// // 		// 			flag = true
+// // 		// 			break
+// // 		// 		}
+// // 		// 	}
+			
 
-user_schema.statics.addprojectmembership = function(userid, projectid, callback){
-	User.findOne({"_id" : userid}, function(err, user){
-		if(err){
-			callback(new Error("error in connection"), null)
-		}
-		else if(!user){
-			callback(new Error("user not found in db"), null)
-		}
-		else{
-			var ind = user.outgoing_project_requests.indexOf(projectid)
-			user.outgoing_project_requests.splice(ind, 1)
-			user.member.push(projectid)
-			user.save(function(err,user){
-				if(err){
-					callback(new Error("Error in saving"), null)
-				}
-				else if(user){
-					callback(null, user)
-				}
-			})				
-		}
-	})
-}
-
-
-
-// for convenience, keep entire mongoose user model in a variable named User.
-var User = mongoose.model('User', user_schema)
-module.exports = User
+			
+// // 		// 	if(!flag){
+// // 		// 		user.outgoing_project_requests.push(projectid)
+// // 		// 		// push the user id in user_requesting array of project schema
+// // 		// 		Project.save_users_requesting(userid, projectid, function(err, project){
+// // 		// 			if(err) callback(err, null)
+// // 		// 			else{
+// // 		// 				user.save(function(err, user){
+// // 		// 					if(err){
+// // 		// 						callback(new Error("Error in updating user database."), null)
+// // 		// 					}
+// // 		// 					else{
+// // 		// 						callback(null, user)
+// // 		// 					}
+// // 		// 				});
+// // 		// 			}
+// // 		// 		})
+// // 		// 	}
+// // 		// 	else{
+// // 		// 		callback(new Error("Already a member."), null)
+// // 		// 	}				
+// // 		// }
+// // 	//})
+	
