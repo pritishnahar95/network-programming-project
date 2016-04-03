@@ -1,6 +1,5 @@
 var express = require('express')
 var router = express.Router()
-var mongoose = require('mongoose')
 var Project = require('../models/project')
 var User = require('../models/user')
 var jwt = require('jsonwebtoken')
@@ -51,21 +50,16 @@ router.get('/projects/:branch/', function(req, res){
 	var code = 200
 	var response = {}
   var branch = req.params.branch
-  Project.find({"branch" : branch}, function(err, project){
-    if (err) {
-      code = 400
-      response = {'error' : true, 'message' : err.message}
-    }
-    
-    else if(project.length == 0){
-      code = 400
-      response = {'error' : true, 'message' : "No projects found corresponding to query branch."}
-    }
-    else{
-      response = {'error' : false, 'messgae' : 'Projects fetched successfully.', 'data' : project}
-    }
-    res.status(code).json(response)
-  })
+	Project.find_project_branch(branch, function(err,projects){	
+		if(err){
+			code = 400
+			response = {'error':true, 'message':err.message} 
+		}
+		else{
+			response = {'error':false, 'data':projects}
+		}
+		res.status(code).json(response)
+	})
 }) 
 
 router.get('/projects/:branch/:tag', function(req, res){
@@ -74,22 +68,16 @@ router.get('/projects/:branch/:tag', function(req, res){
 	var branch = req.params.branch
 	var tag = req.params.tag
   
-  //{ $and: [ { <expression1> }, { <expression2> } , ... , { <expressionN> } ] }
-  Project.find({"branch":branch},{"tag":tag}, function(err, project){
-    if (err) {
-      code = 400
-      response = {'error' : true, 'message' : err.message}
-    }
-    else if(project.length == 0){
-      code = 400
-      response = {'error' : true, 'message' : "No projects found corresponding to query branch and tag."}
-    }
-    else{
-      // only project's objectid going as response.
-      response = {'error' : false, 'messgae' : 'Projects fetched successfully.', 'data' : project}
-    }
-    res.status(code).json(response)
-  })
+	Project.find_project_branch_tag(branch, tag, function(err,projects){	
+		if(err){
+			code = 400
+			response = {'error':true, 'message':err.message} 
+		}
+		else{
+			response = {'error':false, 'data':projects}
+		}
+		res.status(code).json(response)
+	})
 })
 
 // Routes for /users

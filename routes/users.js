@@ -34,12 +34,7 @@ router.put('/acceptinvite/:projectid/:userid_invitedtuser/:decision', function(r
   })  
 })
 
-// user is sending request to join a project
-// check if user is already a member of the project
-// if yes, send an error message
-// if no
-// push the projectid in outgoing_project_requests of user schema
-// push the user id in user_requesting array of project schema
+// done
 router.put('/sendrequest/:username/project/:projectpk', function(req,res){
   var response = {}
   var code = 200

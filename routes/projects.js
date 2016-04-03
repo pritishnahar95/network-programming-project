@@ -1,12 +1,24 @@
 var express = require('express')
 var router = express.Router()
-var mongoose = require('mongoose')
 var Project = require('../models/project')
 var User = require('../models/user')
+var connection = require('../config/db').connection;
 
-// add userid as admin in project's admin array.
-// add projectid in user's admin status array.
-// user's admin_status array has to be unique. not working
+// middleware
+// router.use(function(req, res, next){
+//   var username = req.params.username || req.body.username;
+//   console.log(req.params)
+//   console.log(req.body)
+//   var query = 'SELECT * FROM user_schema where username=' + "'" + username +"'"
+//   connection.query(query, function(err, user){
+//     console.log(user)
+//     if(err) res.status(400).json({error : true, message : 'Database connection error'})
+//     else if(user.length == 0) res.status(400).json({error : true, message : 'User not found in database.'})
+//     else next();
+//   })
+// })
+
+// done
 router.post('/create/:username', function(req, res){
   var response = {}
   var code = 200
@@ -22,18 +34,15 @@ router.post('/create/:username', function(req, res){
   })
 })
 
-
-// check if user is the admin list of project.
-// if yes - save the edited project else send error message.
-// TODO - edit the names from projectlist of all members and admin list of users. - IMP
-router.put('/edit/:projecttitle/:username', function(req,res){
+// done
+router.put('/edit/:project_id/:username', function(req,res){
   var response = {}
   var code = 200
-  var projecttitle = req.params.projecttitle
+  var project_id = req.params.project_id
   var username = req.params.username
   var projectinfo = req.body
   
-  Project.edit_project(projectinfo, projecttitle, username, function(err, project){
+  Project.edit_project(projectinfo, project_id, username, function(err, project){
       if(err){
         code = 400
         response = {'error': true, 'message':err.message}
@@ -45,27 +54,8 @@ router.put('/edit/:projecttitle/:username', function(req,res){
   })
 })
 
-
-router.put('/addmember/:projectid/admin/:userid_admin/request/:userid_requestuser', function(req,res){
-  var response = {}
-  var code = 200
-  var projectid = req.params.projectid
-  var userid_admin = req.params.userid_admin
-  var userid_requestuser = req.params.userid_requestuser
-  
-  Project.addmember(projectid, userid_admin, userid_requestuser, function(err,project){
-    if(err){
-      code = 400
-      response = {'error': true, 'message':err.message}     
-    }
-    else{
-      response = {'error':false, 'message':"New Member added to project"}
-    }
-    res.status(code).json(response)
-  })
-})
-
 //Project admin invites user
+// done
 router.put('/inviteuser/:user_id/project/:project_id/admin/:admin_id', function(req,res){
   var response = {}
   var code = 200
@@ -84,50 +74,27 @@ router.put('/inviteuser/:user_id/project/:project_id/admin/:admin_id', function(
   })
 })
 
-
-
-/////////////////////////////////////////////////////////
 //accept user in project
-router.put('/acceptrequest/:projectid/:userid/:checkerid/:decision', function(req,res){
+router.put('/acceptrequest/project/:project_id/user/:user_id/admin/:admin_id/:decision', function(req,res){
   var response = {}
   var code = 200
-  var projectid = req.params.projectid
-  var userid = req.params.userid
+  var project_id = req.params.project_id
+  var user_id = req.params.user_id
   var decision = req.params.decision
-  var checkerid = req.params.checkerid
+  var admin_id = req.params.admin_id
   
- // console.log(projectid)
-  
-  Project.is_admin(projectid, checkerid , function(err, project){
+  Project.accept_request(project_id, user_id, admin_id, decision, function(err,data){
+    
     if(err){
       code = 400
-      response = {'error' : true , 'message' : err.message}
-      res.status(code).json(response)
+      response = {'error' : true, 'message' : err.message}
     }
     else{
-      //console.log("test")
-      Project.acceptrequest(projectid, userid, decision, function(err,project){
-          if(err){
-            code = 400
-            response = {'error' : true , 'message' : err.message}
-            res.status(code).json(response)
-          }
-          else{
-            User.addprojectmembership(userid, projectid,  function(err, user){       //user.addproject
-            if(err){
-                code = 400
-                response = {'error' : true, 'message' : err.message}
-                res.status(code).json(response)
-              }
-              else{
-                response = {'error' : false, 'message' : "action taken successfully"}
-                res.status(code).json(response)
-              }
-            })
-          }   
-      })
+        response = {'error' : false, 'message' : "Invite accepted", "data" : data}
     }
+        res.status(code).json(response)
   })
+  
 })
 
 //delete project----PENDING

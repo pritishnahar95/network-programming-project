@@ -146,7 +146,8 @@ module.exports = {
 				var request_query = 'SELECT * FROM request_schema where user_id='+ data[0][0].user_id + ' AND project_id='+ data[1][0].project_id				
 				connection.query(member_query + '; ' + request_query, function(err, memreq){
 					if(err) callback(err, null)
-					else if(memreq[0].length != 0 || memreq[1].length != 0) callback(new Error("Invalid request"), null)
+					else if(memreq[0].length != 0 ) callback(new Error("Duplicacy in member schema"), null)
+					else if(memreq[1].length != 0 ) callback(new Error("Duplicacy in request schema"), null)					
 					else{
 						var request_user = {
 							project_id : data[1][0].project_id ,
@@ -163,7 +164,26 @@ module.exports = {
 		})
 	}
 };
-8
+
+
+	/*
+
+		check user_id, project_id in request schema
+		if no - callback
+		if yes -
+			check sender status
+			if senderstatus = 0 - callback (invite pair)
+			else ------->(sender_status == 1)
+				tran start
+				remove user_id, project_id pair from request schema
+				if decision = 1
+					add (user_id, project_id) in member_schema
+				else nothing
+	*/
+
+
+
+
 /*
 check if user id is in the db - done
 project id in db - done
