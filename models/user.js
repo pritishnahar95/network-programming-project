@@ -165,7 +165,7 @@ module.exports = {
 	}, 
 	
 	acceptinvite : function(projectid, userid, decision, callback){
-		var request_query = 'SELECT * from request_schema where userid=' + userid + ' and projectid=' + projectid
+		var request_query = 'SELECT * from request_schema where user_id=' + userid + ' and project_id=' + projectid
 		connection.query(request_query, function(err, request){
 			if(err) callback(err)
 			else if(request.length == 0) callback(new Error("No request entry in database."), null)
@@ -216,18 +216,3 @@ module.exports = {
 		})
 	}
 };
-
-
-	/*
-		check user_id, project_id in request schema
-		if no - callback
-		if yes -
-			check sender status
-			if senderstatus = 0 - callback (invite pair)
-			else ------->(sender_status == 1)
-				tran start
-				remove user_id, project_id pair from request schema
-				if decision = 1
-					add (user_id, project_id) in member_schema
-				else nothing
-	*/

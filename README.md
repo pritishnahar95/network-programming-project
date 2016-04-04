@@ -52,4 +52,65 @@ create table request_schema(
 	FOREIGN KEY (user_id) REFERENCES user_schema(user_id)
 );
 
+create table branch_schema(
+	branch_id INT NOT NULL AUTO_INCREMENT,
+	branch_name VARCHAR(100) NOT NULL,
+	PRIMARY KEY ( branch_id )
+);
+
+create table tag_schema(
+	tag_id INT NOT NULL AUTO_INCREMENT,
+	tag_name VARCHAR(100) NOT NULL,
+	PRIMARY KEY ( tag_id )
+);
+
+create table branch_project_schema(
+	branch_project_id INT NOT NULL AUTO_INCREMENT,
+	branch_id INT NOT NULL,
+	project_id INT NOT NULL,
+	PRIMARY KEY ( branch_project_id ),
+	FOREIGN KEY (branch_id) REFERENCES branch_schema(branch_id),
+	FOREIGN KEY (project_id) REFERENCES project_schema(project_id)
+);
+
+create table tag_project_schema(
+	tag_project_id INT NOT NULL AUTO_INCREMENT,
+	project_id INT NOT NULL,
+	tag_id INT NOT NULL,
+	PRIMARY KEY ( tag_project_id ),
+	FOREIGN KEY (tag_id) REFERENCES tag_schema(tag_id),
+	FOREIGN KEY (project_id) REFERENCES project_schema(project_id)
+);
+
+SELECT a.title, a.description
+FROM project_schema a, branch_project_schema b
+ON a.project_id = b.project_id;
+
+SELECT a.title, a.description
+FROM project_schema a LEFT JOIN branch_project_schema b
+ON a.project_id = b.project_id;
+
+SELECT project_schema.project_id,title,description
+        FROM project_schema,branch_project_schema,branch_schema
+        WHERE branch_schema.branch_id = 1 AND branch_schema.branch_id = branch_project_schema.branch_id AND project_schema.project_id = branch_project_schema.project_id;
+		
+INSERT INTO branch_project_schema VALUES
+        (1, 1, 6);
+
+INSERT INTO tag_project_schema VALUES
+        (1, 1, 1);
+
+INSERT INTO branch_schema VALUES
+        (1, 'eee');
+
+INSERT INTO tag_schema VALUES
+        (1, 'wsn');
+		
 SELECT * FROM user_schema UNION SELECT * FROM project_schema;
+
+
+
+
+SELECT project_schema.project_id,title,description
+        FROM project_schema,branch_project_schema,branch_schema,tag_schema
+        WHERE branch_schema.branch_id = 1 AND tag_schema.tag_id = 2 AND branch_schema.branch_id = branch_project_schema.branch_id AND tag_schema.tag_id = tag_project_schema.tag_id AND project_schema.project_id = branch_project_schema.project_id;

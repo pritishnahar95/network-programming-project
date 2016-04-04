@@ -110,20 +110,47 @@ module.exports = {
 	},
 	
 	find_project_branch : function(branch, callback){
-		var query = 'SELECT * FROM project_schema where branch=' + "'" + branch +"'"
+		var query = 'SELECT * FROM branch_schema where branch_name=' + "'" + branch +"'"
 		connection.query(query, function(err, data){
 			if(err) callback(err, null)
-			else if(data.length == 0) callback(new Error("No projects to show related to this branch."), null)
-			else callback(null, data)
+			else if(data.length == 0) callback(new Error("Branch does not exist."), null)
+			else{
+				var branch_id = data[0].branch_id
+				var query = 'SELECT project_schema.project_id,title,description ' +
+        					'FROM project_schema,branch_project_schema,branch_schema ' +
+        					'WHERE branch_schema.branch_id = ' + branch_id + 
+							' AND branch_schema.branch_id = branch_project_schema.branch_id AND project_schema.project_id = branch_project_schema.project_id'
+				connection.query(query, function(err, data){
+					if(err) callback(err, null)
+					else callback(null, data)
+				})
+			}
 		})
 	},
 	
 	find_project_branch_tag : function(branch, tag, callback){
-		var query = 'SELECT * FROM project_schema where branch=' + "'" + branch + "'" + ' AND tag=' +"'" + tag +"'"
-		connection.query(query, function(err, data){
+		var branch_query = 'SELECT * FROM branch_schema where branch_name=' + "'" + branch +"'"
+		var tag_query = 'SELECT * FROM tag_schema where tag_name=' + "'" + tag +"'"
+		connection.query(branch_query + '; ' + tag_query, function(err, data){
 			if(err) callback(err, null)
-			else if(data.length == 0) callback(new Error("No projects to show related to this branch and tag."), null)
-			else callback(null, data)
+			else if(data[0][0] == null) callback(new Error("Branch does not exist."), null)
+			else if(data[1][0] == null) callback(new Error("Tag does not exist."), null)
+			else{
+				var branch_id = data[0][0].branch_id
+				var tag_id = data[1][0].tag_id
+				var query = 'SELECT project_schema.project_id,title,description ' +
+        					'FROM project_schema,branch_project_schema,branch_schema,tag_schema,tag_project_schema ' +
+        					'WHERE branch_schema.branch_id = ' + branch_id +
+							' AND tag_schema.tag_id = ' + tag_id +
+							' AND branch_schema.branch_id = branch_project_schema.branch_id AND ' +
+							'tag_schema.tag_id = tag_project_schema.tag_id AND project_schema.project_id = branch_project_schema.project_id '+
+							'AND project_schema.project_id = tag_project_schema.project_id' 
+				console.log(query)
+				connection.query(query, function(err, data){
+					if(err) callback(err, null)
+					else callback(null, data)
+				})
+			}
 		})
 	},
 	

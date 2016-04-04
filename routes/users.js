@@ -5,7 +5,7 @@ var Project = require('../models/project')
 // Function to generate tokens.
 
 //User accepts/rejects project invite
-router.put('/acceptinvite/project/:projectid/:userid_invitedtuser/:decision', function(req,res){
+router.put('/acceptinvite/project/:projectid/:userid/:decision', function(req,res){
   var response = {}
   var code = 200
   var projectid = req.params.projectid
