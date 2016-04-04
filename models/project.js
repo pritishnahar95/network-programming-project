@@ -127,8 +127,6 @@ module.exports = {
 		})
 	},
 	
-
-	
 	accept_request : function(project_id, user_id, admin_id, decision, callback){
 		var query = 'SELECT * FROM member_schema where user_id =' + admin_id + ' AND project_id = ' + project_id
 		connection.query(query, function(err,data){

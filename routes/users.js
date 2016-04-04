@@ -5,32 +5,22 @@ var Project = require('../models/project')
 // Function to generate tokens.
 
 //User accepts/rejects project invite
-router.put('/acceptinvite/:projectid/:userid_invitedtuser/:decision', function(req,res){
+router.put('/acceptinvite/project/:projectid/:userid_invitedtuser/:decision', function(req,res){
   var response = {}
   var code = 200
   var projectid = req.params.projectid
-  var userid_invitedtuser = req.params.userid_invitedtuser
+  var userid = req.params.userid
   var decision = req.params.decision
   
- // console.log(projectid)
-  
-  User.acceptinvite(projectid, userid_invitedtuser, decision, function(err, user){
+  User.acceptinvite(projectid, userid, decision, function(err, user){
     if(err){
       code = 400
       response = {'error' : true , 'message' : err.message}
     }
     else{
-      Project.addmember(projectid, userid_invitedtuser, function(err, project){
-        if(err){
-          code = 400
-          response = {'error' : true, 'message' : err.message}
-        }
-        else{
-          response = {'error' : false, 'message' : "action taken successfully"}
-        }
-        res.status(code).json(response)
-      })
+      response = {'error' : false, 'message' : "action taken successfully"}
     }
+    res.status(code).json(response)
   })  
 })
 

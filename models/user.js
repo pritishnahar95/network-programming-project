@@ -162,12 +162,63 @@ module.exports = {
 				})
 			}
 		})
+	}, 
+	
+	acceptinvite : function(projectid, userid, decision, callback){
+		var request_query = 'SELECT * from request_schema where userid=' + userid + ' and projectid=' + projectid
+		connection.query(request_query, function(err, request){
+			if(err) callback(err)
+			else if(request.length == 0) callback(new Error("No request entry in database."), null)
+			else{
+				if(request.sender_status == 0) callback(new Error("Invalid project, user invite pair"), null)
+				else{
+					connection.beginTransaction(function(err){
+						if(err) callback(err, null)
+						else{
+							var remove_query = 'delete from request_schema where user_id = ' + userid + ' AND project_id = '+ projectid
+							connection.query(remove_query, function(err, data){
+								if(err){
+									connection.rollback(function(){
+										callback(err, null)
+									})
+								}
+								else{
+									if(decision == 1){
+										var member_obj = {
+											project_id : projectid,
+											user_id : userid,
+											admin_status : 0
+										}
+										connection.query('INSERT INTO member_schema SET ?', member_obj, function(err, member_obj){
+											if(err){
+												connection.rollback(function(){
+													callback(err,null)
+												})										
+											}
+											else{
+												connection.commit(function(err){
+													if(err){
+														connection.rollback(function(){
+															callback(err, null)
+														})
+													}
+													else callback(null, member_obj)
+												})
+											}		
+										})									
+									}
+								}
+							})
+						}
+					})
+				}
+			}
+		})
 	}
 };
 
 
 	/*
-
 		check user_id, project_id in request schema
 		if no - callback
 		if yes -
@@ -180,56 +231,3 @@ module.exports = {
 					add (user_id, project_id) in member_schema
 				else nothing
 	*/
-
-
-
-
-/*
-check if user id is in the db - done
-project id in db - done
-check if (userid, projectid) exists in member schema or request schema
-userid , project insert in request schema.
-*/
-// // 	//User.findOne({"_id" : userid}, function(err, user){
-		
-// // 		// if(err){
-// // 		// 	callback(new Error("Database connection error."), null)
-// // 		// }
-// // 		// else if(!user){
-// // 		// 	callback(new Error("User not found in database."), null)
-// // 		// }
-// // 		// else{
-// // 		// 	var flag = false
-// // 		// 	// check member status
-// // 		// 	for(var i=0 ; i<user.member_status.length ; i++){
-// // 		// 		if(projectid == user.member_status[i]){
-// // 		// 			flag = true
-// // 		// 			break
-// // 		// 		}
-// // 		// 	}
-			
-
-			
-// // 		// 	if(!flag){
-// // 		// 		user.outgoing_project_requests.push(projectid)
-// // 		// 		// push the user id in user_requesting array of project schema
-// // 		// 		Project.save_users_requesting(userid, projectid, function(err, project){
-// // 		// 			if(err) callback(err, null)
-// // 		// 			else{
-// // 		// 				user.save(function(err, user){
-// // 		// 					if(err){
-// // 		// 						callback(new Error("Error in updating user database."), null)
-// // 		// 					}
-// // 		// 					else{
-// // 		// 						callback(null, user)
-// // 		// 					}
-// // 		// 				});
-// // 		// 			}
-// // 		// 		})
-// // 		// 	}
-// // 		// 	else{
-// // 		// 		callback(new Error("Already a member."), null)
-// // 		// 	}				
-// // 		// }
-// // 	//})
-	
