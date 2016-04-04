@@ -37,7 +37,8 @@ router.put('/sendrequest/:username/project/:projectpk', function(req,res){
       response = {'error' : true , 'message' : err.message}
     }
     else{
-      response = {'error' : false, 'message' : "action taken successfully", "data" : data}
+      // bug
+      response = {'error' : false, 'message' : "Request sent to admin successfully."}
     }
     res.status(code).json(response)
   })

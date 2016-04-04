@@ -17,7 +17,6 @@ var jwt = require('jsonwebtoken')
     POST /users/forgotpassword
 */
 
-
 // Utility function for creating jwt tokens
 var get_token = function(username){
 	return jwt.sign(username, "qwerty", {expiresIn: 1440})
@@ -91,7 +90,7 @@ router.post('/users/register', function(req, res){
       response = {'error' : true, 'message' : err.message}
     }
     else{
-      response = {'error' : false, 'message' : "User created successfully.", "userId" : userid}
+      response = {'error' : false, 'message' : "User created successfully. Confirmation key sent to your bitsmail"}
     }
     res.status(code).json(response)
   })
@@ -135,7 +134,6 @@ router.post('/users/login', function(req, res){
   })
 })
 
-// doubt
 router.put('/users/forgotpassword/:username', function(req, res){
   var response = {}
   var code = 200

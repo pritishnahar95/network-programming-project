@@ -90,7 +90,7 @@ router.put('/acceptrequest/project/:project_id/user/:user_id/admin/:admin_id/:de
       response = {'error' : true, 'message' : err.message}
     }
     else{
-        response = {'error' : false, 'message' : "Invite accepted", "data" : data}
+        response = {'error' : false, 'message' : "Invite accepted.", "data" : data}
     }
         res.status(code).json(response)
   })
