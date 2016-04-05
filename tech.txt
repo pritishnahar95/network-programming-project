@@ -1,0 +1,20 @@
+nodejs - nodejs easier to get started, light weight webserver in 5 lines of code
+		whereas in php you need apache and many other cofigurations to be done.
+
+		best package management tool - npm (node package manager), easy to install and
+		uninstall dependencies.
+
+		PHP follows the typical client-server model. Every page request initiates your application; you load configuration parameters, connect to a database, fetch information and render HTML.
+
+		A Node.js app runs permanently and it need only initialize once. \m/ 
+
+		PHP and most other server-side languages use an obvious blocking execution model. When you issue a command such as fetching information from a database, that command will complete execution before progressing to the next statement. Node.js doesn’t (normally) wait. Instead, you provide a callback function which is executed once the action is complete.
+
+		 In most environments you'll find only limited pieces available in async flavors, but in Node everything (or nearly everything) is async-only. It's actually hard to write non-async code in Node!
+
+		 better performance than django, flask.
+
+mongodb - no joins - https://docs.mongodb.org/manual/reference/database-references/ 
+			no transactions - https://docs.mongodb.org/manual/faq/fundamentals/#does-mongodb-support-transactions
+
+			^both are from official documentation.
