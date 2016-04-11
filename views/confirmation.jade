@@ -1,16 +1,18 @@
 extends layout
 
 block content
-    h3 Login
-    form(class='form-horizontal',role='form')
+    h3 User Confirmation
+    form(class='form-horizontal',name='confirmationform', role='form', ng-controller='RegisterCtrl')
     
         div(class='form-group')
             label(class='control-label col-sm-2',for='confkey') Confirmation Key:
             div(class='col-sm-10')
-                input(class='form-control', type='text',id='confkey')
+                input(class='form-control', name='confkey',type='text',id='confkey',ng-model="confkey", required)
+                span(style="color:red", ng-show="confirmationform.confkey.$dirty && confirmationform.confkey.$invalid")
+                    span(ng-show="confirmationform.confkey.$error.required") Confirmation key is required. 
 
        
         div(class='form-group')
             div(class="span7 text-center")
-                button(type="submit" class="btn btn-success") Activate Account 
+                button(type="submit" ng-disabled="confirmationform.confkey.$invalid" class="btn btn-success" ng-click="confirm()") Activate Account 
                 

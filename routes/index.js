@@ -39,7 +39,7 @@ router.get('/about', function(req,res){
   res.render('about', {title:" | About"})
 })
 
-router.get('/confirmation', function(req,res){
+router.get('/confirmation/:username', function(req,res){
   res.render('confirmation', {title:" | Confirmation"})
 })
 
@@ -99,16 +99,14 @@ router.get('/projects/:branch/:tag', function(req, res){
 
 router.post('/users/register', function(req, res){
   var response = {}
-  var code = 200
   User.create_user(req.body, function(err, userid){
     if(err){
-      code = 400
       response = {'error' : true, 'message' : err.message}
     }
     else{
       response = {'error' : false, 'message' : "User created successfully. Confirmation key sent to your bitsmail"}
     }
-    res.status(code).json(response)
+    res.json(response)
   })
 })
 

@@ -1,9 +1,13 @@
 doctype html
-html
+html(ng-app="ProShareApp")
   head
     title= "ProShare" + title
-    link(rel='stylesheet', href='/stylesheets/style.css')
-    link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+    link(rel='stylesheet', type="text/css", href='/stylesheets/style.css')
+    link(rel='stylesheet', type="text/css", href='/stylesheets/vendors/bootstrap.min.css')
+    script(type="text/javascript", src='/javascripts/vendors/angular.min.js')
+    script(type="text/javascript", src='/javascripts/vendors/angular-animate.min.js')
+    script(type="text/javascript", src='/javascripts/vendors/angular-route.min.js')
+    script(type="text/javascript", src='/javascripts/ProShareApp.js')
   body
     header.navbar.navbar-default.navbar-fixed-top
       .container
@@ -26,11 +30,15 @@ html
               a(href='/register') Register
             li
               a(href='/projects') Projects
-              
+    
     div(class="container")
       block content
     
     footer(class="footer navbar-fixed-bottom")
       div(class="container")
         p(class="text-muted") Made with LOVE.
+        
+
+        
+
     

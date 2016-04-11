@@ -2,44 +2,60 @@ extends layout
 
 block content
     h3 Register
-    form(class='form-horizontal',role='form')
+    form(class='form-horizontal',name='registerform',ng-controller="RegisterCtrl", novalidate)
     
         div(class='form-group')
             label(class='control-label col-sm-2',for='username') Username:
             div(class='col-sm-10')
-                input(class='form-control', type='text',id='username')
+                input(class='form-control', name='username', type='text',id='username',ng-model="user.username", required)
+                span(style="color:red", ng-show="registerform.username.$dirty && registerform.username.$invalid")
+                    span(ng-show="registerform.username.$error.required") Username is required. 
                 
         div(class='form-group')
             label(class='control-label col-sm-2',for='firstname') First Name:
             div(class='col-sm-10')
-                input(class='form-control', type='text',id='firstname')
+                input(class='form-control', name='firstname',type='text',id='firstname',ng-model="user.firstname", required)
+                span(style="color:red", ng-show="registerform.firstname.$dirty && registerform.firstname.$invalid")
+                    span(ng-show="registerform.firstname.$error.required") First Name is required. 
                 
         div(class='form-group')
             label(class='control-label col-sm-2',for='lastname') Last Name:
             div(class='col-sm-10')
-                input(class='form-control', type='text',id='lastname')
+                input(class='form-control', name='lastname', type='text',id='lastname',ng-model="user.lastname", required)
+                span(style="color:red", ng-show="registerform.lastname.$dirty && registerform.lastname.$invalid")
+                    span(ng-show="registerform.lastname.$error.required") Last Name is required. 
                 
         div(class='form-group')
-            label(class='control-label col-sm-2',for='bitsid') BITS Id:
+            label(class='control-label col-sm-2',for='bitsid') BITS ID:
             div(class='col-sm-10')
-                input(class='form-control', type='text',id='bitsid')
+                input(class='form-control', name='bitsid', type='text',id='bitsid',ng-model="user.bitsid", required)
+                span(style="color:red", ng-show="registerform.bitsid.$dirty && registerform.bitsid.$invalid")
+                    span(ng-show="registerform.bitsid.$error.required") Valid BITS ID is required.
         
         div(class='form-group')
             label(class='control-label col-sm-2',for='branch') Branch:
             div(class='col-sm-10')
-                input(class='form-control', type='text',id='branch')
+                input(class='form-control', name='branch', type='text',id='branch',ng-model="user.branch", required)
+                span(style="color:red", ng-show="registerform.branch.$dirty && registerform.branch.$invalid")
+                    span(ng-show="registerform.branch.$error.required") Branch name is required.
                 
         div(class='form-group')
             label(class='control-label col-sm-2',for='pasword') Password:
             div(class='col-sm-10')
-                input(class='form-control', type='password',id='Password')
-        
+                input(class='form-control', name='password', type='password',id='Password',ng-model="user.password", required)
+                span(style="color:red", ng-show="registerform.password.$dirty && registerform.password.$invalid")
+                    span(ng-show="registerform.password.$error.required") Password is required.
+
         div(class='form-group')
             h4(class='span7 text-center') Already have an account? 
                 a(href="/login") Login
        
         div(class='form-group')
             div(class="span7 text-center")
-                button(type="submit" class="btn btn-success") Register  
+                button(type="submit" ng-disabled='registerform.username.$invalid || registerform.firstname.$invalid || registerform.lastname.$invalid || registerform.bitsid.$invalid || registerform.branch.$invalid || registerform.password.$invalid' class="btn btn-success",ng-click="register()") Register
+                
+        div(class='form-group')
+            div(class='span7 text-center')
+                h4(ng-show="error") {{errmessage}}
                 
              

@@ -53,13 +53,13 @@ var send_pwd = function(user_email){
 module.exports = {
 	create_user : function(request, callback){
 		var username = request.username;
-		var query = 'SELECT * FROM user_schema where username=' + "'" + username + "'" 
+		var query = 'SELECT * FROM user_schema where username=' + "'" + username + "'"
 		connection.query(query, function(err, users){
 			if (err) callback(err, null)
 			else if(users.length == 0){
 				var bitsid = request.bitsid
 				var email = "f" + bitsid.substring(0,4) + bitsid.substring(8,11) + "@goa.bits-pilani.ac.in"
-				var user = { 
+				var user = {  
 					username : request.username,
 					firstname : request.firstname,
 					lastname : request.lastname,
@@ -80,7 +80,7 @@ module.exports = {
 				});
 			}
 			else{
-				callback(err, null)
+				callback(new Error("Username already exists in the database."), null)
 			}
 		})
 	},
