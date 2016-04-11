@@ -23,25 +23,41 @@ var get_token = function(username){
 }
 
 // working
-router.get('/', function(req, res, next) {
-  res.json({'message' : "Welcome to ProShare."});
+router.get('/', function(req, res) {
+  res.render('index', {title:" | Landing"});
 });
+
+router.get('/login', function(req,res){
+  res.render('login', {title:" | Login"})
+})
+
+router.get('/register', function(req,res){
+  res.render('register', {title:" | Register"})
+})
+
+router.get('/about', function(req,res){
+  res.render('about', {title:" | About"})
+})
+
+router.get('/confirmation', function(req,res){
+  res.render('confirmation', {title:" | Confirmation"})
+})
+
+
 
 // Routes for /projects
 
-//wokrking
+//working
 router.get('/projects', function(req, res){
-	var code = 200
 	var response = {}
 	Project.find_all(function(err,projects){	
 		if(err){
-			code = 400
-			response = {'error':true, 'message':err.message} 
+			response = {error:true, title: " | Projects", message:err.message} 
 		}
 		else{
-			response = {'error':false, 'data':projects}
+			response = {error:false, title: " | Projects", message:projects}
 		}
-		res.status(code).json(response)
+		res.render('projects', response)
 	})
 })
 

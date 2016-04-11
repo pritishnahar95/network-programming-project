@@ -116,4 +116,10 @@ SELECT project_schema.project_id,title,description
         WHERE branch_schema.branch_id = 1 AND tag_schema.tag_id = 2 AND branch_schema.branch_id = branch_project_schema.branch_id AND tag_schema.tag_id = tag_project_schema.tag_id AND project_schema.project_id = branch_project_schema.project_id;
 eyJhbGciOiJIUzI1NiJ9.dW1hbmd0eQ.oYKKxaoyQwWIdHHPfdd5AWH9Kuuo_pIGe5JzUzxUKBY
 eyJhbGciOiJIUzI1NiJ9.dW1hbmd0eQ.oYKKxaoyQwWIdHHPfdd5AWH9Kuuo_pIGe5JzUzxUKBY
+
+TODO - 
+	Implement proper protection authentication by extracting username from token passed by the user.
+	App should not crash when invalid request come at routes. Do this by chaining middlewares.
+	
+
 		

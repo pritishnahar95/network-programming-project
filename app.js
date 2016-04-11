@@ -12,7 +12,7 @@ var users = require('./routes/users');
 var projects = require('./routes/projects');
 
 // connection to database made
-require('./config/db')
+var connection = require('./config/db').connection
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -33,15 +33,18 @@ app.use(function(req, res, next) {
 
   // decode token
   if (token) {
-
     // verifies secret and checks exp
     jwt.verify(token, "qwerty", function(err, decoded) {      
       if (err) {
         return res.json({ success: false, message: 'Failed to authenticate token.' });    
       } else {
-        // if everything is good, save to request for use in other routes
-        req.decoded = decoded;    
-        next();
+        var username = jwt.decode(token)
+        var query = 'SELECT * FROM user_schema where username=' + "'" + username + "'" 
+        connection.query(query, function(err, data){
+          if(err) res.json({ success: false, message: 'Database connection error.'});
+          else if(data.length == 0) res.json({ success: false, message: 'No user found.'});
+          else next()
+        }) 
       }
     });
 

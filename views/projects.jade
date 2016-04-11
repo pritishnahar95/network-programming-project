@@ -1,0 +1,14 @@
+extends layout
+
+block content
+
+	//h2 List Projects by
+
+	h2 Current Projects
+	if error
+		h1 Error
+	else
+		each val in message
+			div(class='list-group')
+				a(href='#', class="list-group-item")= val.title
+			
