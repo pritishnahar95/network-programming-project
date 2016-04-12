@@ -132,17 +132,15 @@ router.post('/users/confirmation/:userid', function(req, res){
 // working
 router.post('/users/login', function(req, res){
   var response = {}
-  var code = 200
   User.login(req.body, function(err, user){
     if(err){
-      code = 400
       response = {'error' : true, 'message' : err.message}
     }
     else{
-      var token = get_token(req.body.username)
+      var token = get_token(user[0].user_id)
       response = {'error' : false, 'message' : "User login successful.", "token" : token}
     }
-    res.status(code).json(response)
+    res.json(response)
   })
 })
 

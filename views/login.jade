@@ -2,17 +2,21 @@ extends layout
 
 block content
     h3 Login
-    form(class='form-horizontal',role='form')
+    form(class='form-horizontal',name='loginform',role='form', ng-controller='LoginCtrl', novalidate)
     
         div(class='form-group')
             label(class='control-label col-sm-2',for='username') Username:
             div(class='col-sm-10')
-                input(class='form-control', type='text',id='username')
+                input(class='form-control', name='username', type='text',id='username',ng-model="user.username", required)
+                span(style="color:red", ng-show="loginform.username.$dirty && loginform.username.$invalid")
+                    span(ng-show="loginform.username.$error.required") Username is required. 
 
         div(class='form-group')
-            label(class='control-label col-sm-2',for='password') Password:
+            label(class='control-label col-sm-2',for='pasword') Password:
             div(class='col-sm-10')
-                input(class='form-control', type='password',id='password')                
+                input(class='form-control', name='password', type='password',id='Password',ng-model="user.password", required)
+                span(style="color:red", ng-show="loginform.password.$dirty && loginform.password.$invalid")
+                    span(ng-show="loginform.password.$error.required") Password is required.              
         
         div(class='form-group')
             h4(class='span7 text-center') Don't have an account? 
@@ -20,5 +24,9 @@ block content
        
         div(class='form-group')
             div(class="span7 text-center")
-                button(type="submit" class="btn btn-success") Login  
+                button(type="submit" ng-disabled='loginform.username.$invalid || loginform.password.$invalid' class="btn btn-success",ng-click="login()") Login
+                
+        div(class='form-group')
+            div(class='span7 text-center')
+                h4(ng-show="error") {{errmessage}}
                 

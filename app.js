@@ -1,7 +1,7 @@
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
+//var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var jwt = require('jsonwebtoken')
@@ -24,7 +24,7 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+//app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -43,8 +43,8 @@ app.use(function(req, res, next) {
       if (err) {
         return res.json({ success: false, message: 'Failed to authenticate token.' });    
       } else {
-        var username = jwt.decode(token)
-        var query = 'SELECT * FROM user_schema where username=' + "'" + username + "'" 
+        var userid = jwt.decode(token)
+        var query = 'SELECT * FROM user_schema where user_id=' +  userid
         connection.query(query, function(err, data){
           if(err) res.json({ success: false, message: 'Database connection error.'});
           else if(data.length == 0) res.json({ success: false, message: 'No user found.'});

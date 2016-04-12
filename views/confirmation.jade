@@ -2,7 +2,7 @@ extends layout
 
 block content
     h3 User Confirmation
-    form(class='form-horizontal',name='confirmationform', role='form', ng-controller='ConfirmationCtrl')
+    form(class='form-horizontal',name='confirmationform', role='form', ng-controller='ConfirmationCtrl', novalidate)
     
         div(class='form-group')
             label(class='control-label col-sm-2',for='confkey') Confirmation Key:

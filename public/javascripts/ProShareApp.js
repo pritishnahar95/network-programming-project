@@ -39,3 +39,24 @@ app.controller('ConfirmationCtrl', ['$scope', '$http', '$window', '$location', f
     })   
   }
 }])
+
+app.controller('LoginCtrl', ['$scope', '$http', '$window', '$location', function($scope, $http, $window, $location){
+  $scope.error = false
+  console.log($scope.user)
+  $scope.login = function(){
+    $http({
+      method: 'POST',
+      url: 'http://localhost:3000/users'+$location.url(),
+      data: $scope.user,
+    }).
+    success(function(response){
+      if(response.error){
+        $scope.error = response.error;
+        $scope.errmessage = response.message;
+      }
+      else{
+        $window.location.href = '/'
+      }
+    })   
+  }
+}])
