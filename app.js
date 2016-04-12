@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var jwt = require('jsonwebtoken')
 var routes = require('./routes/index');
+var cors = require('cors');
 var app = express();
 var User  = require('./models/user')
 var users = require('./routes/users');
@@ -13,6 +14,9 @@ var projects = require('./routes/projects');
 
 // connection to database made
 var connection = require('./config/db').connection
+
+app.use(cors())
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -27,6 +31,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
+
 app.use(function(req, res, next) {
   // check header or url parameters or post parameters for token
   var token = req.body.token || req.query.token || req.headers['x-access-token'];

@@ -18,8 +18,8 @@ var jwt = require('jsonwebtoken')
 */
 
 // Utility function for creating jwt tokens
-var get_token = function(username){
-	return jwt.sign(username, "qwerty", {expiresIn: 1440})
+var get_token = function(userid){
+	return jwt.sign(userid, "qwerty", {expiresIn: 1440})
 }
 
 // working
@@ -39,7 +39,7 @@ router.get('/about', function(req,res){
   res.render('about', {title:" | About"})
 })
 
-router.get('/confirmation/:username', function(req,res){
+router.get('/confirmation/:userid', function(req,res){
   res.render('confirmation', {title:" | Confirmation"})
 })
 
@@ -104,7 +104,7 @@ router.post('/users/register', function(req, res){
       response = {'error' : true, 'message' : err.message}
     }
     else{
-      response = {'error' : false, 'message' : "User created successfully. Confirmation key sent to your bitsmail"}
+      response = {'error' : false, 'message' : "User created successfully. Confirmation key sent to your bitsmail", data: userid}
     }
     res.json(response)
   })
@@ -112,22 +112,20 @@ router.post('/users/register', function(req, res){
 
 // working
 // TODO - active flag to be included in db
-router.post('/users/confirmation/:username', function(req, res){
+router.post('/users/confirmation/:userid', function(req, res){
   var response = {}
-  var code = 200
-  var username = req.params.username
+  var userid = req.params.userid
   var conf_key = req.body.conf_key
-  User.compare_conf_key(conf_key, username, function(err, user){
+  User.compare_conf_key(conf_key, userid, function(err, user){
     if(err){
-      code = 400
       response = {'error' : true, 'message' : err.message}
     }
     else{
-      var token = get_token(username)
+      var token = get_token(userid)
       // generate token and send in the response
       response = {'error' : false, 'message' : "Your account activated.", "token" : token}
     }
-    res.status(code).json(response)
+    res.json(response)
   })
 })
 

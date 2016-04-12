@@ -85,8 +85,8 @@ module.exports = {
 		})
 	},
 	
-	compare_conf_key : function(conf_key, username, callback){
-		var query = 'SELECT * FROM user_schema where username=' + "'" + username + "'" 
+	compare_conf_key : function(conf_key, userid, callback){
+		var query = 'SELECT * FROM user_schema where user_id=' + userid
 		connection.query(query, function(err, users){
 			if(err) callback(err, null)
 			else if(users.length == 0) callback(new Error("No user found."), null)
@@ -94,7 +94,7 @@ module.exports = {
 				if(users[0].conf_key == conf_key) callback(null, users[0])
 				else {
 					users[0].conf_key = send_confkey(users[0].email);
-					var update_query = 'UPDATE user_schema SET conf_key=' + users[0].conf_key +' where username=' + "'" + username + "'"
+					var update_query = 'UPDATE user_schema SET conf_key=' + users[0].conf_key +' where user_id=' + userid
 					connection.query(update_query, function(err, rows){
 						if(err) callback(err, null)
 						else callback (new Error("New confirmation key sent."), rows)

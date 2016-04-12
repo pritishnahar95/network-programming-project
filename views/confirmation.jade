@@ -2,7 +2,7 @@ extends layout
 
 block content
     h3 User Confirmation
-    form(class='form-horizontal',name='confirmationform', role='form', ng-controller='RegisterCtrl')
+    form(class='form-horizontal',name='confirmationform', role='form', ng-controller='ConfirmationCtrl')
     
         div(class='form-group')
             label(class='control-label col-sm-2',for='confkey') Confirmation Key:
@@ -15,4 +15,7 @@ block content
         div(class='form-group')
             div(class="span7 text-center")
                 button(type="submit" ng-disabled="confirmationform.confkey.$invalid" class="btn btn-success" ng-click="confirm()") Activate Account 
-                
+        
+        div(class='form-group')
+            div(class='span7 text-center')
+                h4(ng-show="error") {{errmessage}}        
