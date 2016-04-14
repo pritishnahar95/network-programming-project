@@ -2,7 +2,11 @@ var express = require('express')
 var router = express.Router()
 var User = require('../models/user')
 var Project = require('../models/project')
-// Function to generate tokens.
+
+// get functions
+router.get('/dashboard', function(req, res){
+  res.render('dashboard', {title:" | Dashboard"})
+})
 
 //User accepts/rejects project invite
 router.put('/acceptinvite/project/:projectid/:userid/:decision', function(req,res){

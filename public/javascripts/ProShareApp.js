@@ -5,10 +5,12 @@ var app = angular.module('ProShareApp', ['LocalStorageModule'], function($locati
   });
 });
 
+
 app.config(function (localStorageServiceProvider) {
   localStorageServiceProvider
     .setPrefix('ProSharePrefix');
 });
+
 
 app.controller('RegisterCtrl', ['$scope','$http', '$window', 'localStorageService', function($scope, $http, $window, localStorageService){
   $scope.error = false
@@ -64,6 +66,8 @@ app.controller('LoginCtrl', ['$scope', '$http', '$window', '$location', 'localSt
       else{
         localStorageService.set('user_info', response)
         localStorageService.set('loggedin', true)
+        localStorageService.cookie.set('x-access-token', response.token)
+        //console.log(localStorageService.cookie.get('x-access-token'))
         // console.log(localStorageService.get('user_info'))
         $window.location.href = '/'
       }
@@ -71,12 +75,14 @@ app.controller('LoginCtrl', ['$scope', '$http', '$window', '$location', 'localSt
   }
 }])
 
-app.controller('IndexCtrl', ['$scope', '$window', 'localStorageService', function($scope, $window, localStorageService){
+app.controller('IndexCtrl', ['$scope', '$window', 'localStorageService', '$http', function($scope, $window, localStorageService, $http){
   $scope.loggedin = localStorageService.get('loggedin')
-  // console.log(localStorageService.get('user_info'))
-  // console.log(localStorageService.get('loggedin'))
   $scope.logout = function(){
     localStorageService.clearAll()
     $window.location.href = '/'
   }
 }])
+
+app.controller('DashboardCtrl', function(){
+  
+})

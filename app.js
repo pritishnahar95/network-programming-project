@@ -33,9 +33,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 
 app.use(function(req, res, next) {
+  // console.log(res.cookie())
+  // console.log()
   // check header or url parameters or post parameters for token
-  var token = req.body.token || req.query.token || req.headers['x-access-token'];
-
+  
+  var token = req.headers.cookie.split(";")[3].split("=")[1];
+  console.log(token)
   // decode token
   if (token) {
     // verifies secret and checks exp
@@ -54,11 +57,11 @@ app.use(function(req, res, next) {
     });
 
   } else {
-
+    
     // if there is no token
     // return an error
     return res.status(403).send({ 
-        success: false, 
+        error: true, 
         message: 'No token provided.' 
     });
     
@@ -75,9 +78,9 @@ app.use(function(req, res, next) {
 //     else next()
 //   })
 // })
-
-app.use('/projects', projects);
 app.use('/users', users);
+app.use('/projects', projects);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

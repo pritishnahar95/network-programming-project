@@ -30,9 +30,9 @@ html(ng-app="ProShareApp")
             li(ng-show="!loggedin")
               a(href='/register') Register
             li(ng-show="loggedin")
-              a(href="/dashboard") My dashboard
+              a(class="btn" href='/users/dashboard') My dashboard
             li(ng-show="loggedin")
-              a(ng-click="logout()") Logout
+              a(class="btn" ng-click="logout()") Logout
             li
               a(href='/projects') Projects
     
