@@ -1,0 +1,10 @@
+extends dashboard
+
+block dashboard-ui
+	div(ng-controller="UserDetailsCtrl")
+		h3 User Details
+		p Username - {{username}}
+		p Name - {{name}}
+		p BITS ID - {{bitsid}}
+		p Branch - {{branch}}
+		p Email - {{email}}

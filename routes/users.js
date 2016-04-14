@@ -8,6 +8,34 @@ router.get('/dashboard', function(req, res){
   res.render('dashboard', {title:" | Dashboard"})
 })
 
+router.get('/dashboard/userdetails', function(req, res){
+  res.render('userdetails', {title:" | Dashboard - User Details"})
+})
+
+router.get('/dashboard/adminprojects', function(req, res){
+  res.render('adminprojects', {title:" | Dashboard - Admin Projects"})
+})
+
+router.get('/dashboard/memberprojects', function(req, res){
+  res.render('memberprojects', {title:" | Dashboard - Member Projects"})
+})
+
+router.get('/dashboard/projectrequests', function(req, res){
+  res.render('projectrequests', {title:" | Dashboard - Project Requests"})
+})
+
+router.get('/dashboard/projectinvites', function(req, res){
+  res.render('projectinvites', {title:" | Dashboard - Project Invites"})
+})
+
+router.get('/dashboard/otherprojects', function(req, res){
+  res.render('otherprojects', {title:" | Dashboard - Other Projects"})
+})
+
+router.get('/dashboard/createproject', function(req, res){
+  res.render('createproject', {title:" | Dashboard - Create Project"})
+})
+
 //User accepts/rejects project invite
 router.put('/acceptinvite/project/:projectid/:userid/:decision', function(req,res){
   var response = {}

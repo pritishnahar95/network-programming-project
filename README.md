@@ -126,5 +126,3 @@ TODO -
 	Implement proper protection authentication by extracting username from token passed by the user.
 	App should not crash when invalid request come at routes. Do this by chaining middlewares.
 	
-
-		

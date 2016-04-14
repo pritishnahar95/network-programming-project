@@ -84,32 +84,21 @@ app.controller('IndexCtrl', ['$scope', '$window', 'localStorageService', '$http'
   }
 }])
 
-app.controller('DashboardCtrl', ['$scope', '$window', 'localStorageService', '$http', function($scope, $window, localStorageService, $http){
+app.controller('DashboardCtrl', ['$scope', 'localStorageService', function($scope, localStorageService){
   $scope.username = localStorageService.get('user_info').user.username
-  $scope.flag1 = true
-  $scope.flag2 = false
-  $scope.flag3 = false
-  
+}])
+
+// Controllers inside dashboard view.
+app.controller('UserDetailsCtrl', ['$scope', 'localStorageService', function($scope, localStorageService){
   var userObject = localStorageService.get('user_info').user
-  console.log(userObject)
-  
   $scope.username = userObject.username
   $scope.name = userObject.firstname + " " + userObject.lastname
   $scope.bitsid = userObject.bitsid
   $scope.branch = userObject.branch
   $scope.email = userObject.email
-  
-  $scope.userdetails = function(){
-    $scope.flag1 = true
-    $scope.flag2 = false
-    $scope.flag3 = false
-  }
-  
-  $scope.userprojects = function(){
-    $scope.flag1 = false
-    $scope.flag2 = true
-    $scope.flag3 = false
-    
+}])
+
+app.controller('AdminProjectsCtrl', ['$scope', 'localStorageService', '$http', function($scope, localStorageService, $http){
     $http({
       method: 'GET',
       url: 'http://10.3.11.34:3000/users/getprojects/'+$scope.username
@@ -118,37 +107,28 @@ app.controller('DashboardCtrl', ['$scope', '$window', 'localStorageService', '$h
       if(response.error){
         $scope.errorValue = true
         $scope.errormessage = response.message
-        // console.log(response.error)
       }
       else{
         $scope.data = response.projects
-        // console.log(response.projects)
-        //$window.location.href = '/users/dashboard'
       }
     })
-     
-  }
-  
-  $scope.createproject = function(){
-    $scope.flag1 = false
-    $scope.flag2 = false
-    $scope.flag3 = true
-  }
-  
-  $scope.create = function(){
-    $http({
-      method: 'POST',
-      url: 'http://10.3.11.34:3000/projects/create/'+$scope.username,
-      data: {title: $scope.project.title, description: $scope.project.description},
-    }).
-    success(function(response){
-      if(response.error){
-        $scope.error = response.error;
-        $scope.errmessage = response.message;
-      }
-      else{
-        $window.location.href = '/users/dashboard'
-      }
-    })   
-  }
+}])
+
+app.controller('CreateProjectCtrl', ['$scope', 'localStorageService', '$http', '$window', function($scope, localStorageService, $http, $window){
+    $scope.create = function(){
+      $http({
+        method: 'POST',
+        url: 'http://10.3.11.34:3000/projects/create/'+localStorageService.get('user_info').user.username,
+        data: {title: $scope.project.title, description: $scope.project.description},
+      }).
+      success(function(response){
+        if(response.error){
+          $scope.error = response.error;
+          $scope.errmessage = response.message;
+        }
+        else{
+          $window.location.href = '/users/dashboard/adminprojects'
+        }
+      })
+    }
 }])

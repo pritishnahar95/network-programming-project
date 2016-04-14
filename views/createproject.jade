@@ -1,0 +1,27 @@
+extends dashboard
+
+block dashboard-ui
+	div(ng-controller="CreateProjectCtrl")
+		h3 Create Project
+		form(class='form-horizontal',name='projectform',role='form', novalidate)
+			div(class='form-group')
+				label(class='control-label col-sm-2',for='title') Project Title:
+				div(class='col-sm-10')
+					input(class='form-control', name='title', type='text',id='projecttitle',ng-model="project.title", required)
+					span(style="color:red", ng-show="projectform.title.$dirty && projectform.title.$invalid")
+						span(ng-show="projectform.title.$error.required") Project Title is required. 
+			
+			div(class='form-group')
+				label(class='control-label col-sm-2',for='description') Description:
+				div(class='col-sm-10')
+					textarea(class='form-control', name='description', type='text',id='description',ng-model="project.description", required)
+					span(style="color:red", ng-show="projectform.description.$dirty && projectform.description.$invalid")
+						span(ng-show="projectform.description.$error.required") Description is required.
+			
+			div(class='form-group')
+				div(class="span7 text-center")
+					button(type="submit" ng-disabled='projectform.title.$invalid || loginform.description.$invalid' class="btn btn-success",ng-click="create()") Create Project
+			
+			div(class='form-group')
+				div(class='span7 text-center')
+					h4(ng-show="error") {{errmessage}}
