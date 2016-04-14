@@ -36,8 +36,8 @@ app.use(function(req, res, next) {
   // console.log(res.cookie())
   // console.log()
   // check header or url parameters or post parameters for token
-  
-  var token = req.headers.cookie.split(";")[3].split("=")[1];
+  console.log(req.headers.cookie)
+  var token = req.headers.cookie.split("=")[1];
   console.log(token)
   // decode token
   if (token) {

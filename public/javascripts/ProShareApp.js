@@ -79,6 +79,7 @@ app.controller('IndexCtrl', ['$scope', '$window', 'localStorageService', '$http'
   $scope.loggedin = localStorageService.get('loggedin')
   $scope.logout = function(){
     localStorageService.clearAll()
+    localStorageService.cookie.clearAll();
     $window.location.href = '/'
   }
 }])
