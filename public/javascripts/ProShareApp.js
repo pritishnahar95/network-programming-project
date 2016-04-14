@@ -1,11 +1,16 @@
-var app = angular.module('ProShareApp', [], function($locationProvider){
+var app = angular.module('ProShareApp', ['LocalStorageModule'], function($locationProvider){
   $locationProvider.html5Mode({
     enabled: true,
     requireBase: false
   });
 });
 
-app.controller('RegisterCtrl', ['$scope','$http', '$window', function($scope, $http, $window){
+app.config(function (localStorageServiceProvider) {
+  localStorageServiceProvider
+    .setPrefix('ProSharePrefix');
+});
+
+app.controller('RegisterCtrl', ['$scope','$http', '$window', 'localStorageService', function($scope, $http, $window, localStorageService){
   $scope.error = false
   $scope.register = function(){
     $http.post('/users/register', $scope.user).success(function(response){
@@ -20,7 +25,7 @@ app.controller('RegisterCtrl', ['$scope','$http', '$window', function($scope, $h
   }
 }]);
 
-app.controller('ConfirmationCtrl', ['$scope', '$http', '$window', '$location', function($scope, $http, $window, $location){
+app.controller('ConfirmationCtrl', ['$scope', '$http', '$window', '$location', 'localStorageService', function($scope, $http, $window, $location, localStorageService){
   $scope.error = false
   $scope.confirm = function(){
     $http({
@@ -34,15 +39,17 @@ app.controller('ConfirmationCtrl', ['$scope', '$http', '$window', '$location', f
         $scope.errmessage = response.message;
       }
       else{
+        localStorageService.set('user_info', response)
+        localStorageService.set('loggedin', true)
+        //console.log(localStorageService.get('user_info'))
         $window.location.href = '/'
       }
     })   
   }
 }])
 
-app.controller('LoginCtrl', ['$scope', '$http', '$window', '$location', function($scope, $http, $window, $location){
+app.controller('LoginCtrl', ['$scope', '$http', '$window', '$location', 'localStorageService', function($scope, $http, $window, $location, localStorageService){
   $scope.error = false
-  console.log($scope.user)
   $scope.login = function(){
     $http({
       method: 'POST',
@@ -55,8 +62,21 @@ app.controller('LoginCtrl', ['$scope', '$http', '$window', '$location', function
         $scope.errmessage = response.message;
       }
       else{
+        localStorageService.set('user_info', response)
+        localStorageService.set('loggedin', true)
+        // console.log(localStorageService.get('user_info'))
         $window.location.href = '/'
       }
     })   
+  }
+}])
+
+app.controller('IndexCtrl', ['$scope', '$window', 'localStorageService', function($scope, $window, localStorageService){
+  $scope.loggedin = localStorageService.get('loggedin')
+  // console.log(localStorageService.get('user_info'))
+  // console.log(localStorageService.get('loggedin'))
+  $scope.logout = function(){
+    localStorageService.clearAll()
+    $window.location.href = '/'
   }
 }])

@@ -43,8 +43,6 @@ router.get('/confirmation/:userid', function(req,res){
   res.render('confirmation', {title:" | Confirmation"})
 })
 
-
-
 // Routes for /projects
 
 //working
@@ -123,7 +121,7 @@ router.post('/users/confirmation/:userid', function(req, res){
     else{
       var token = get_token(userid)
       // generate token and send in the response
-      response = {'error' : false, 'message' : "Your account activated.", "token" : token}
+      response = {'error' : false, 'message' : "Your account activated.", "token" : token, "user" : user}
     }
     res.json(response)
   })
@@ -138,7 +136,7 @@ router.post('/users/login', function(req, res){
     }
     else{
       var token = get_token(user[0].user_id)
-      response = {'error' : false, 'message' : "User login successful.", "token" : token}
+      response = {'error' : false, 'message' : "User login successful.", "token" : token, "user" : user[0]}
     }
     res.json(response)
   })
