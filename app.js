@@ -36,9 +36,9 @@ app.use(function(req, res, next) {
   // console.log(res.cookie())
   // console.log()
   // check header or url parameters or post parameters for token
-  console.log(req.headers.cookie)
+  //console.log(req.headers.cookie)
   var token = req.headers.cookie.split("=")[1];
-  console.log(token)
+  //console.log(token)
   // decode token
   if (token) {
     // verifies secret and checks exp

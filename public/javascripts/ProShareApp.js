@@ -32,7 +32,7 @@ app.controller('ConfirmationCtrl', ['$scope', '$http', '$window', '$location', '
   $scope.confirm = function(){
     $http({
       method: 'POST',
-      url: 'http://localhost:3000/users'+$location.url(),
+      url: 'http://10.3.11.34:3000/users'+$location.url(),
       data: {conf_key: $scope.confkey},
     }).
     success(function(response){
@@ -55,7 +55,7 @@ app.controller('LoginCtrl', ['$scope', '$http', '$window', '$location', 'localSt
   $scope.login = function(){
     $http({
       method: 'POST',
-      url: 'http://localhost:3000/users'+$location.url(),
+      url: 'http://10.3.11.34:3000/users'+$location.url(),
       data: $scope.user,
     }).
     success(function(response){
@@ -84,6 +84,53 @@ app.controller('IndexCtrl', ['$scope', '$window', 'localStorageService', '$http'
   }
 }])
 
-app.controller('DashboardCtrl', function(){
+app.controller('DashboardCtrl', ['$scope', '$window', 'localStorageService', '$http', function($scope, $window, localStorageService, $http){
+  $scope.username = localStorageService.get('user_info').user.username
+  $scope.flag1 = true
+  $scope.flag2 = false
+  $scope.flag3 = false
   
-})
+  var userObject = localStorageService.get('user_info').user
+  console.log(userObject)
+  
+  $scope.username = userObject.username
+  $scope.name = userObject.firstname + " " + userObject.lastname
+  $scope.bitsid = userObject.bitsid
+  $scope.branch = userObject.branch
+  $scope.email = userObject.email
+  
+  $scope.userdetails = function(){
+    $scope.flag1 = true
+    $scope.flag2 = false
+    $scope.flag3 = false
+  }
+  
+  $scope.userprojects = function(){
+    $scope.flag1 = false
+    $scope.flag2 = true
+    $scope.flag3 = false
+  }
+  
+  $scope.createproject = function(){
+    $scope.flag1 = false
+    $scope.flag2 = false
+    $scope.flag3 = true
+  }
+  
+  $scope.create = function(){
+    $http({
+      method: 'POST',
+      url: 'http://10.3.11.34:3000/projects/create/'+$scope.username,
+      data: {title: $scope.project.title, description: $scope.project.description},
+    }).
+    success(function(response){
+      if(response.error){
+        $scope.error = response.error;
+        $scope.errmessage = response.message;
+      }
+      else{
+        $window.location.href = '/users/dashboard'
+      }
+    })   
+  }
+}])

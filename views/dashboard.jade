@@ -2,5 +2,47 @@ extends layout
 
 block content
 	div(ng-controller="DashboardCtrl")
-		h3 User Dashboard
-		h5 Information
+		h5 Hi {{username}}
+		div(class="btn-group btn-group-justified" role="group")
+			div(class="btn-group" role="group")
+				button(type="button" class="btn btn-default", ng-click="userdetails()") User Details
+			div(class="btn-group" role="group")
+				button(type="button" class="btn btn-default", ng-click="userprojects()") Your Projects
+			div(class="btn-group" role="group")
+				button(type="button" class="btn btn-default", ng-click="createproject()") Create Project
+				
+		div(ng-show="flag1")
+			h3 User Details
+			p Username - {{username}}
+			p Name - {{name}}
+			p BITS ID - {{bitsid}}
+			p Branch - {{branch}}
+			p Email - {{email}}
+			
+		div(ng-show="flag2")
+			h3 Your Projects
+			
+		div(ng-show="flag3")
+			h3 Create Project
+			form(class='form-horizontal',name='projectform',role='form', novalidate)
+				div(class='form-group')
+					label(class='control-label col-sm-2',for='title') Project Title:
+					div(class='col-sm-10')
+						input(class='form-control', name='title', type='text',id='projecttitle',ng-model="project.title", required)
+						span(style="color:red", ng-show="projectform.title.$dirty && projectform.title.$invalid")
+							span(ng-show="projectform.title.$error.required") Project Title is required. 
+				
+				div(class='form-group')
+					label(class='control-label col-sm-2',for='description') Description:
+					div(class='col-sm-10')
+						textarea(class='form-control', name='description', type='text',id='description',ng-model="project.description", required)
+						span(style="color:red", ng-show="projectform.description.$dirty && projectform.description.$invalid")
+							span(ng-show="projectform.description.$error.required") Description is required.
+				
+				div(class='form-group')
+					div(class="span7 text-center")
+						button(type="submit" ng-disabled='projectform.title.$invalid || loginform.description.$invalid' class="btn btn-success",ng-click="create()") Create Project
+				
+				div(class='form-group')
+					div(class='span7 text-center')
+						h4(ng-show="error") {{errmessage}}
