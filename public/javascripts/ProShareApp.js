@@ -109,6 +109,24 @@ app.controller('DashboardCtrl', ['$scope', '$window', 'localStorageService', '$h
     $scope.flag1 = false
     $scope.flag2 = true
     $scope.flag3 = false
+    
+    $http({
+      method: 'GET',
+      url: 'http://10.3.11.34:3000/users/getprojects/'+$scope.username
+    }).
+    success(function(response){
+      if(response.error){
+        $scope.errorValue = true
+        $scope.errormessage = response.message
+        // console.log(response.error)
+      }
+      else{
+        $scope.data = response.projects
+        // console.log(response.projects)
+        //$window.location.href = '/users/dashboard'
+      }
+    })
+     
   }
   
   $scope.createproject = function(){

@@ -48,4 +48,20 @@ router.put('/sendrequest/:username/project/:projectpk', function(req,res){
   })
 })
 
+router.get('/getprojects/:username', function(req, res){
+  var response = {}
+  var code = 200
+  var username = req.params.username
+  User.getprojects(username, function(err, projects){
+    if(err){
+      code = 400
+      response = {'error' : true, 'message' : err.message}
+    }
+    else{
+      response = {'error' : false, 'message' : 'Projects fetched successfully', 'projects' : projects}
+    }
+    res.status(code).json(response)
+  }) 
+})
+
 module.exports = router;

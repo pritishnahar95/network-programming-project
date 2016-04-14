@@ -214,5 +214,24 @@ module.exports = {
 				}
 			}
 		})
-	}
+	},
+	
+	getprojects : function(username, callback){
+		var user_query = 'SELECT * FROM user_schema where username=' + "'" + username + "'"
+		connection.query(user_query, function(err, user){
+			if(err) callback(err, null)
+			else if(user.length == 0) callback(new Error("User not found in database"), null)
+			else{
+				var member_query = 'SELECT project_schema.project_id,title,description' +
+				' FROM project_schema,member_schema WHERE member_schema.admin_status = 1' + 
+				' AND member_schema.user_id=' + user[0].user_id +
+				' AND project_schema.project_id = member_schema.project_id;'
+				connection.query(member_query, function(err, projects){
+					if(err) callback(err, null)
+					else if(projects.length == 0) callback(new Error("No projects to show"), null)
+					else callback(null, projects)
+				})
+			} 
+		})
+	}	
 };

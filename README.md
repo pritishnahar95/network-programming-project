@@ -117,6 +117,11 @@ SELECT project_schema.project_id,title,description
 eyJhbGciOiJIUzI1NiJ9.dW1hbmd0eQ.oYKKxaoyQwWIdHHPfdd5AWH9Kuuo_pIGe5JzUzxUKBY
 eyJhbGciOiJIUzI1NiJ9.dW1hbmd0eQ.oYKKxaoyQwWIdHHPfdd5AWH9Kuuo_pIGe5JzUzxUKBY
 
+
+SELECT project_schema.project_id,title,description
+        FROM project_schema,member_schema
+        WHERE member_schema.admin_status = 1 AND member_schema.user_id=40 AND project_schema.project_id = member_schema.project_id;
+
 TODO - 
 	Implement proper protection authentication by extracting username from token passed by the user.
 	App should not crash when invalid request come at routes. Do this by chaining middlewares.
