@@ -114,6 +114,22 @@ app.controller('AdminProjectsCtrl', ['$scope', 'localStorageService', '$http', f
     })
 }])
 
+app.controller('MemberProjectsCtrl', ['$scope', 'localStorageService', '$http', function($scope, localStorageService, $http){
+    $http({
+      method: 'GET',
+      url: 'http://10.3.11.34:3000/users/getallprojects/'+$scope.username
+    }).
+    success(function(response){
+      if(response.error){
+        $scope.errorValue = true
+        $scope.errormessage = response.message
+      }
+      else{
+        $scope.data = response.projects
+      }
+    })
+}])
+
 app.controller('CreateProjectCtrl', ['$scope', 'localStorageService', '$http', '$window', function($scope, localStorageService, $http, $window){
     $scope.create = function(){
       $http({

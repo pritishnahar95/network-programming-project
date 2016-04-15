@@ -1,3 +1,8 @@
 extends dashboard
 
 block dashboard-ui
+	div(ng-controller="MemberProjectsCtrl")
+		h3 Projects in which you have member access.
+		div(ng-show="errorValue") {{errormessage}}
+		ul(ng-show="!errorValue" ng-repeat="project in data") 
+			a(href="#") {{project.title}} | {{project.description}}

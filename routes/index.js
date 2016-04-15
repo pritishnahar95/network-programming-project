@@ -19,7 +19,7 @@ var jwt = require('jsonwebtoken')
 
 // Utility function for creating jwt tokens
 var get_token = function(userid){
-	return jwt.sign(userid, "qwerty", {expiresIn: 1440})
+	return jwt.sign(userid, "qwerty", {exp: "1440"})
 }
 
 // working
@@ -48,13 +48,14 @@ router.get('/confirmation/:userid', function(req,res){
 //working
 router.get('/projects', function(req, res){
 	var response = {}
-	Project.find_all(function(err,projects){	
+	Project.find_all(function(err, projects){	
 		if(err){
 			response = {error:true, title: " | Projects", message:err.message} 
 		}
 		else{
 			response = {error:false, title: " | Projects", message:projects}
 		}
+    console.log(projects)
 		res.render('projects', response)
 	})
 })

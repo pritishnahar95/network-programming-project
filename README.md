@@ -99,6 +99,9 @@ INSERT INTO branch_project_schema VALUES
 
 INSERT INTO tag_project_schema VALUES
         (1, 1, 1);
+		
+INSERT INTO member_schema VALUES
+        (30, 16, 19, 0);
 
 INSERT INTO branch_schema VALUES
         (1, 'eee');
@@ -121,6 +124,10 @@ eyJhbGciOiJIUzI1NiJ9.dW1hbmd0eQ.oYKKxaoyQwWIdHHPfdd5AWH9Kuuo_pIGe5JzUzxUKBY
 SELECT project_schema.project_id,title,description
         FROM project_schema,member_schema
         WHERE member_schema.admin_status = 1 AND member_schema.user_id=40 AND project_schema.project_id = member_schema.project_id;
+
+SELECT title, description, username
+        FROM project_schema, member_schema, user_schema
+        WHERE user_schema.user_id = member_schema.user_id AND project_schema.project_id = member_schema.project_id;
 
 TODO - 
 	Implement proper protection authentication by extracting username from token passed by the user.
