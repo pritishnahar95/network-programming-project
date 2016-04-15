@@ -1,8 +1,38 @@
+@font-face { 
+  font-family: "myriadsetprotext"; 
+  src: url("../fonts/myriad-set-pro_text.ttf") format("truetype"); 
+}
+
+*{font-family : myriadsetprotext;}
+
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.footer{
+  height : 50px;
+  background-color: #03051B
+}
+.red{
+  color: brown;
+}
+.text-muted{
+  margin-top : 12px;
+}
+
+.left{
+  padding-top: 5px; 
+  float: left;
+}
+
+.right{
+  float: right;
+}
+
+.text-left{
+  text-align: left;
 }
 
 a {
-  color: #00B7FF;
+  color: #ffffff;
 }

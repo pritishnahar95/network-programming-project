@@ -4,6 +4,7 @@ html(ng-app="ProShareApp")
     title= "ProShare" + title
     link(rel='stylesheet', type="text/css", href='/stylesheets/style.css')
     link(rel='stylesheet', type="text/css", href='/stylesheets/vendors/bootstrap.min.css')
+    link(rel='stylesheet', href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css")
     script(type="text/javascript", src='/javascripts/vendors/angular.min.js')
     script(type="text/javascript", src='/javascripts/vendors/angular-animate.min.js')
     script(type="text/javascript", src='/javascripts/vendors/angular-route.min.js')
@@ -13,12 +14,12 @@ html(ng-app="ProShareApp")
     header.navbar.navbar-default.navbar-fixed-top(ng-controller="IndexCtrl")
       .container
         .navbar-header
-          button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1', aria-expanded='false')
+          button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='.navbar collapse', aria-expanded='false')
             span.sr-only Toggle navigation
             span.icon-bar
             span.icon-bar
             span.icon-bar
-        #bs-example-navbar-collapse-1.collapse.navbar-collapse
+        div(class="collapse navbar-collapse" id="bs-example-navbar-collapse-1")
           ul.nav.navbar-nav.navbar-left
             li
               a(href='/') ProShare
@@ -42,4 +43,8 @@ html(ng-app="ProShareApp")
     
     footer(class="footer navbar-fixed-bottom")
       div(class="container")
-        p(class="text-muted") Made with LOVE.
+        div(class="text-muted left") Made with 
+          i(class="red fa fa-heart")
+        div(class="text-muted right") Contribute &nbsp      
+          a(href="https://github.com/umangty/network-programming-project" target="_blank")
+            img(src='/images/GitHub.png')
