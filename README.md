@@ -165,3 +165,8 @@ TODO -
 	
 select title, u.username ,m.admin_status,description from member_schema m inner join user_schema u on m.user_id=u.user_id inner join project_schema p on m.project_id=p.project_id;
 select * from (select n.content, p.project_id, p.project_notice_id from notice_schema n inner join project_notice_schema p on n.notice_id=p.project_notice_id) as r where r.project_id=12 order by r.project_notice_id desc
+select u.username, p.title from member_schema n inner join user_schema u on u.user_id=m.user_id inner join project_schema p on m.project_id=p.project_id 
+
+
+// non member project query
+select * from (select u.user_id, p.project_id, u.username, p.title from member_schema n inner join user_schema u on u.user_id=n.user_id inner join project_schema p on n.project_id=p.project_id ) as t where t.user_id!=40;
