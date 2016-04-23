@@ -25,6 +25,15 @@ body {
   float: left;
 }
 
+.list-group-item{
+  height: 100px;  
+}
+
+.invite{
+  float: right;
+  margin-bottom: 50px;
+}
+
 .right{
   float: right;
 }

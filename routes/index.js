@@ -55,24 +55,21 @@ router.get('/projects', function(req, res){
 		else{
 			response = {error:false, title: " | Projects", message:projects}
 		}
-    console.log(projects)
 		res.render('projects', response)
 	})
 })
 
 router.get('/projects/:branch/', function(req, res){
-	var code = 200
 	var response = {}
   var branch = req.params.branch
 	Project.find_project_branch(branch, function(err,projects){	
 		if(err){
-			code = 400
 			response = {'error':true, 'message':err.message} 
 		}
 		else{
 			response = {'error':false, 'data':projects}
 		}
-		res.status(code).json(response)
+		res.render('projects', response)
 	})
 }) 
 

@@ -1,36 +1,66 @@
 var connection = require('../config/db').connection;
 module.exports = {
-	create_project : function(request, username, callback){
+	create_project : function(request, branch_id, username, callback){
+		
 		var project_title = request.title
 		var user_query = 'SELECT * FROM user_schema where username=' + "'" + username + "'"
 		connection.query(user_query, function(err, data){
 			if(err) callback(err, null)
 			else if(data.length == 0) callback(new Error("User not found in database."), null)
 			else{
-				var project = {
-					title : project_title,
-					description : request.description
-				}
-				connection.query('INSERT INTO project_schema SET ?', project, function(err, project){
-					if(err) callback(err, null);
+				connection.beginTransaction(function(err){
+					if(err) callback(err, null)
 					else{
-						var member_obj = {
-							project_id : project.insertId,
-							user_id : data[0].user_id,
-							admin_status : 1
+						var project = {
+							title : project_title,
+							description : request.description
 						}
-						connection.query('INSERT INTO member_schema SET ?', member_obj, function(err, member){
+						connection.query('INSERT INTO project_schema SET ?', project, function(err, project){
 							if(err){
-								var delete_query = 'DELETE FROM TABLE project_schema where project_id=' + member_obj.project_id
-								connection.query(delete_query, function(err, data){
+								connection.rollback(function(err){
 									if(err) callback(err, null)
-									else callback(new Error("Something went wrong"), null)
 								})
 							}
-							else callback(null, member)
+							else{
+								var member_obj = {
+									project_id : project.insertId,
+									user_id : data[0].user_id,
+									admin_status : 1
+								}
+								connection.query('INSERT INTO member_schema SET ?', member_obj, function(err, member){
+									if(err){
+										connection.rollback(function(err){
+											if(err) callback(err, null)
+										})
+									}
+									else{
+										var project_branch_obj = {
+											project_id : project.insertId,
+											branch_id : branch_id
+										}
+										connection.query('INSERT INTO branch_project_schema SET ?', project_branch_obj, function(err, object){
+											if(err){
+												connection.rollback(function(err){
+													if(err) callback(err, null)
+												})
+											}
+											else{
+												connection.commit(function(err){
+													if(err){
+														connection.rollback(function(){
+															callback(err, null)
+														})
+													}
+													else callback(null, object)
+												})
+											}
+										})
+									}
+								})
+							}
 						})
 					}
-				});
+				})
 			}
 		})
 	},
@@ -77,7 +107,7 @@ module.exports = {
 				var admin_member_query = 'SELECT * FROM member_schema where user_id='+ data[1][0].user_id + ' AND project_id='+ data[2][0].project_id
 				var invite_query = 'SELECT * FROM request_schema where user_id='+ data[0][0].user_id + ' AND project_id='+ data[2][0].project_id				
 				connection.query(user_member_query + '; ' + admin_member_query +';' + invite_query, function(err, memreq){
-					console.log(memreq)
+
 					if(err) callback(err, null)
 					else if(memreq[0].length != 0 || memreq[1].length == 0 || memreq[2].length != 0) callback(new Error("Invalid invite"), null)
 					else{
@@ -101,7 +131,7 @@ module.exports = {
 	},
 	
 	find_all : function(callback){
-		var query = 'SELECT * FROM project_schema'
+		var query = 'select * from (select u.username , m.admin_status, title,description from member_schema m inner join project_schema p on m.project_id=p.project_id inner join user_schema u on m.user_id=u.user_id) as t where t.admin_status=1'
 		connection.query(query, function(err, data){
 			if(err) callback(err, null)
 			else if(data.length == 0) callback(new Error("No projects to show."), null)
@@ -145,7 +175,6 @@ module.exports = {
 							' AND branch_schema.branch_id = branch_project_schema.branch_id AND ' +
 							'tag_schema.tag_id = tag_project_schema.tag_id AND project_schema.project_id = branch_project_schema.project_id '+
 							'AND project_schema.project_id = tag_project_schema.project_id' 
-				console.log(query)
 				connection.query(query, function(err, data){
 					if(err) callback(err, null)
 					else callback(null, data)
@@ -165,7 +194,6 @@ module.exports = {
 				}
 				else{
 					connection.query('select * from request_schema where user_id ='+ user_id +  ' AND project_id='+ project_id,function(err,data){
-						console.log(data)
 						if(err) callback(err, null)
 						else if(data.length == 0) callback(new Error("User has not requested to join the project"), null)
 						else{
@@ -218,5 +246,56 @@ module.exports = {
 				}
 			}
 		})
+	},
+	
+	create_notice : function(content, user_id, project_id, callback){
+		// check for admin status for now. then start insertion.
+		var member_query = 'SELECT * FROM member_schema where user_id=' + user_id + ' AND project_id=' + project_id
+		connection.query(member_query, function(err, data){
+			if(err) callback(err, null)
+			else if (data.length == 0) callback(new Error("No rights to post notice"), null)
+			else if(data[0].admin_status != 1) callback(new Error("No rights to post notice"), null)
+			else{
+				connection.beginTransaction(function(err){
+					if(err) callback(err, null)
+					else{
+						var notice_obj = {
+							content : content,
+						}
+						connection.query('INSERT INTO notice_schema SET ?', notice_obj, function(err, notice){
+							if(err){
+								connection.rollback(function(){
+									callback(err,null)
+								})										
+							}
+							else{
+								var project_notice_obj =  {
+									project_id : project_id,
+									notice_id : notice.insertId,
+									user_id : user_id
+								}
+								connection.query('INSERT INTO project_notice_schema SET ?', project_notice_obj, function(err, data){
+									if(err){
+										connection.rollback(function(){
+											callback(err,null)
+										})										
+									}
+									else{
+										connection.commit(function(err){
+											if(err){
+												connection.rollback(function(){
+													callback(err, null)
+												})
+											}
+											else callback(null, data)
+										})
+									}
+								})
+							}
+						})
+					}
+				})
+			}
+		})  
 	}
 };	

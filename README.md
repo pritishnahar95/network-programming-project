@@ -82,6 +82,22 @@ create table tag_project_schema(
 	FOREIGN KEY (project_id) REFERENCES project_schema(project_id)
 );
 
+create table notice_schema(
+	notice_id INT NOT NULL AUTO_INCREMENT,
+	content  VARCHAR(100) NOT NULL,
+	PRIMARY KEY ( notice_id )
+);
+
+create table project_notice_schema(
+	project_notice_id INT NOT NULL AUTO_INCREMENT,
+	project_id INT NOT NULL,
+	user_id INT NOT NULL,
+	notice_id INT NOT NULL,
+	PRIMARY KEY ( project_notice_id ),
+	FOREIGN KEY (project_id) REFERENCES project_schema(project_id),
+	FOREIGN KEY (user_id) REFERENCES user_schema(user_id)
+);
+
 SELECT a.title, a.description
 FROM project_schema a, branch_project_schema b
 ON a.project_id = b.project_id;
@@ -125,11 +141,25 @@ SELECT project_schema.project_id,title,description
         FROM project_schema,member_schema
         WHERE member_schema.admin_status = 1 AND member_schema.user_id=40 AND project_schema.project_id = member_schema.project_id;
 
+SELECT title, description
+        FROM project_schema, member_schema
+        WHERE member_schema.user_id != 40 AND project_schema.project_id = member_schema.project_id;
+	
 SELECT title, description, username
         FROM project_schema, member_schema, user_schema
-        WHERE user_schema.user_id = member_schema.user_id AND project_schema.project_id = member_schema.project_id;
+        WHERE project_schema.project_id = member_schema.project_id AND user_schema.user_id = member_schema.user_id;
+	
+select * from ( select m.project_id , m.user_id , title,description from member_schema m inner join project_schema p on m.project_id=p.project_id) as t where t.project_id=16;
+select * from ( select m.project_id , m.user_id , title,description from member_schema m inner join project_schema p on m.project_id=p.project_id) as t where t.user_id=40;
+
+SELECT title, description, username
+        FROM project_schema, member_schema, user_schema
+        WHERE member_schema.admin_status = 1 AND user_schema.user_id=member_schema.project_id;
 
 TODO - 
 	Implement proper protection authentication by extracting username from token passed by the user.
 	App should not crash when invalid request come at routes. Do this by chaining middlewares.
+	
+select title, u.username ,m.admin_status,description from member_schema m inner join user_schema u on m.user_id=u.user_id inner join project_schema p on m.project_id=p.project_id;
+
 	

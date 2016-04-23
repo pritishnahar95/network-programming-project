@@ -216,6 +216,7 @@ module.exports = {
 		})
 	},
 	
+	// admin level projects
 	getprojects : function(username, callback){
 		var user_query = 'SELECT * FROM user_schema where username=' + "'" + username + "'"
 		connection.query(user_query, function(err, user){
@@ -253,4 +254,17 @@ module.exports = {
 			} 
 		})
 	},
+	
+	// bug
+	otherprojects :function(user_id, callback){
+		// not checking validity of user
+		var member_query = 'SELECT title, description' +
+        				' FROM project_schema, member_schema'+
+        				' WHERE member_schema.user_id != ' + user_id +
+						' AND project_schema.project_id = member_schema.project_id'
+		connection.query(member_query, function(err, projects){
+			if(err) callback(err, null)
+			else callback(null, projects)
+		})
+	}
 };

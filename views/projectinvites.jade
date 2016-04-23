@@ -1,3 +1,8 @@
 extends dashboard
 
 block dashboard-ui
+	div(ng-controller="ProjectInvitesCtrl")
+		h3 You have got invitation to join in these projects.
+		// div(ng-show="errorValue") {{errormessage}}
+		// ul(ng-show="!errorValue" ng-repeat="project in data") 
+		// 	a(href="#") {{project.title}} | {{project.description}}

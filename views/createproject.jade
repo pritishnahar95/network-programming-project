@@ -11,6 +11,16 @@ block dashboard-ui
 					span(style="color:red", ng-show="projectform.title.$dirty && projectform.title.$invalid")
 						span(ng-show="projectform.title.$error.required") Project Title is required. 
 			
+			
+			div(class='form-group')
+				label(class='control-label col-sm-2',for='branch') Related Branch:
+				div(class='col-sm-10')
+					select(class="form-control" id="branch" ng-model="project.branchname")
+						option(selected) EEE
+						option CSE
+						option Mech 
+						option Chem
+			
 			div(class='form-group')
 				label(class='control-label col-sm-2',for='description') Description:
 				div(class='col-sm-10')

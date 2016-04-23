@@ -23,7 +23,13 @@ router.post('/create/:username', function(req, res){
   var response = {}
   var code = 200
   var username = req.params.username
-  Project.create_project(req.body, username, function(err, projectid){
+  var branch_id = 0
+  var s = req.body.branchname
+  if(s === "EEE") branch_id=1
+  if(s === "CSE") branch_id=2
+  if(s === "Mech") branch_id=3
+  if(s === "Chem") branch_id=4
+  Project.create_project(req.body, branch_id, username, function(err, projectid){
     if(err){
       response = {'error' : true, 'message' : err.message}
     }
@@ -92,9 +98,27 @@ router.put('/acceptrequest/project/:project_id/user/:user_id/admin/:admin_id/:de
     else{
         response = {'error' : false, 'message' : "Invite accepted.", "data" : data}
     }
-        res.status(code).json(response)
+    res.status(code).json(response)
   })
   
+})
+
+router.post('/createnotice/user/:user_id/project/project_id', function(req, res){
+  var user_id = req.params.user_id
+  var project_id = req.params.project_id
+  var response = {}
+  var code = 200
+  var content = req.body.content
+  Project.create_notice(content, user_id, project_id, function(err, data){
+    if(err){
+      code = 400
+      response = {'error' : true, 'message' : err.message}
+    }
+    else{
+        response = {'error' : false, 'message' : "notice creation successful.", "data" : data}
+    }
+    res.status(code).json(response)
+  })
 })
 
 //delete project----PENDING

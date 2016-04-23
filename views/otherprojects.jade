@@ -1,3 +1,11 @@
 extends dashboard
 
 block dashboard-ui
+	h3 Projects in which you might be interested.
+	div(ng-show="errorValue") {{errormessage}}
+	div(class='list-group' ng-controller="OtherProjectsCtrl")
+		ul(class="list-group-item" ng-show="!errorValue" ng-repeat="project in projects") 
+			h4(class="list-group-item-heading") {{project.title}}
+			p(class="list-group-item-text") Description: {{project.description}}
+			
+		

@@ -53,12 +53,14 @@ app.controller('ConfirmationCtrl', ['$scope', '$http', '$window', '$location', '
 app.controller('LoginCtrl', ['$scope', '$http', '$window', '$location', 'localStorageService', function($scope, $http, $window, $location, localStorageService){
   $scope.error = false
   $scope.login = function(){
+    
     $http({
       method: 'POST',
       url: 'http://10.3.11.34:3000/users'+$location.url(),
       data: $scope.user,
     }).
     success(function(response){
+      console.log(response)
       if(response.error){
         $scope.error = response.error;
         $scope.errmessage = response.message;
@@ -109,9 +111,29 @@ app.controller('AdminProjectsCtrl', ['$scope', 'localStorageService', '$http', f
         $scope.errormessage = response.message
       }
       else{
+        localStorageService.set('admin_projects', response.projects)
         $scope.data = response.projects
       }
     })
+    
+    $scope.createnotice = function(){
+      console.log($scope.tit)
+      // $http({
+      //   method: 'POST',
+      //   url: 'http://10.3.11.34:3000/projects/createnotice/user/'+localStorageService.get('user_info').user.user_id + '/project/' + $scope.project.project_id,
+      //   data: {content: $scope.project.content}
+      // }).
+      // success(function(response){
+      //   if(response.error){
+      //     $scope.error = response.error;
+      //     $scope.errmessage = response.message;
+      //   }
+      //   else{
+      //     $window.location.href = '/users/dashboard/adminprojects'
+      //   }
+      // })
+    }
+    
 }])
 
 app.controller('MemberProjectsCtrl', ['$scope', 'localStorageService', '$http', function($scope, localStorageService, $http){
@@ -135,7 +157,7 @@ app.controller('CreateProjectCtrl', ['$scope', 'localStorageService', '$http', '
       $http({
         method: 'POST',
         url: 'http://10.3.11.34:3000/projects/create/'+localStorageService.get('user_info').user.username,
-        data: {title: $scope.project.title, description: $scope.project.description},
+        data: {title: $scope.project.title, description: $scope.project.description, branchname:$scope.project.branchname}
       }).
       success(function(response){
         if(response.error){
@@ -147,4 +169,21 @@ app.controller('CreateProjectCtrl', ['$scope', 'localStorageService', '$http', '
         }
       })
     }
+}])
+
+app.controller('OtherProjectsCtrl', ['$scope', 'localStorageService', '$http', function($scope, localStorageService, $http){
+    console.log(localStorageService.get('user_info').user.user_id)
+    $http({
+      method: 'GET',
+      url: 'http://10.3.11.34:3000/users/otherprojects/'+localStorageService.get('user_info').user.user_id
+    }).
+    success(function(response){
+      if(response.error){
+        $scope.errorValue = true
+        $scope.errormessage = response.message
+      }
+      else{
+        $scope.projects = response.projects
+      }
+    })
 }])
