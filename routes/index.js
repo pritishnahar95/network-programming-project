@@ -74,23 +74,6 @@ router.get('/projects/:branch/', function(req, res){
 	})
 }) 
 
-router.get('/projects/:branch/:tag', function(req, res){
-	var code = 200
-	var response = {}
-	var branch = req.params.branch
-	var tag = req.params.tag
-  
-	Project.find_project_branch_tag(branch, tag, function(err,projects){	
-		if(err){
-			code = 400
-			response = {'error':true, 'message':err.message} 
-		}
-		else{
-			response = {'error':false, 'data':projects}
-		}
-		res.status(code).json(response)
-	})
-})
 
 // Routes for /users
 

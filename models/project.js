@@ -297,5 +297,13 @@ module.exports = {
 				})
 			}
 		})  
+	},
+	
+	getnotices : function(project_id, callback){
+		var notice_query = 'select * from (select n.content, p.project_id, p.project_notice_id from notice_schema n inner join project_notice_schema p on n.notice_id=p.project_notice_id) as r where r.project_id='+project_id+' order by r.project_notice_id desc'
+		connection.query(notice_query, function(err, data){
+			if(err) callback(err, null)
+			else callback(null, data)
+		})
 	}
 };	

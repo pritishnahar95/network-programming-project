@@ -115,25 +115,68 @@ app.controller('AdminProjectsCtrl', ['$scope', 'localStorageService', '$http', f
         $scope.data = response.projects
       }
     })
+}])
+
+
+app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$location', '$window', function($scope, localStorageService, $http, $location, $window){
+    $http({
+      method: 'GET',
+      url: 'http://10.3.11.34:3000/projects/page/'+$location.url().split("/")[3]
+    }).
+    success(function(response){
+      if(response.error){
+        $scope.errorValue = true
+        $scope.errormessage = response.message
+      }
+      else{
+        $scope.project = response.data[0]
+      }
+    })
     
-    $scope.createnotice = function(){
-      console.log($scope.tit)
-      // $http({
-      //   method: 'POST',
-      //   url: 'http://10.3.11.34:3000/projects/createnotice/user/'+localStorageService.get('user_info').user.user_id + '/project/' + $scope.project.project_id,
-      //   data: {content: $scope.project.content}
-      // }).
-      // success(function(response){
-      //   if(response.error){
-      //     $scope.error = response.error;
-      //     $scope.errmessage = response.message;
-      //   }
-      //   else{
-      //     $window.location.href = '/users/dashboard/adminprojects'
-      //   }
-      // })
+    $scope.shownotices = function(){
+      $http({
+        method: 'GET',
+        url: 'http://10.3.11.34:3000/projects/getnotices/project/'+$scope.project.project_id
+      }).
+      success(function(response){
+        
+        console.log(response.message)
+        if(response.error){
+          $scope.errorValue = true
+          $scope.errormessage = response.message
+        }
+        else{
+          $scope.data = response.data
+        }
+      })
     }
-    
+   
+    $scope.createnotice = function(){
+      var url = 'http://10.3.11.34:3000/projects/createnotice/user/'+localStorageService.get('user_info').user.user_id + '/project/' + $scope.project.project_id
+      console.log()
+      $http({
+        method: 'POST',
+        url: url,
+        data: {content: $scope.notice.content},
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        transformRequest: function(obj) {
+          var str = [];
+          for(var p in obj)
+          str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+          return str.join("&");
+        }
+      }).
+      success(function(response){
+        console.log(response)
+        if(response.error){
+          $scope.error = response.error;
+          $scope.errmessage = response.message;
+        }
+        else{
+          $window.location.href = '/users/dashboard/adminprojects'
+        }
+      })
+    }
 }])
 
 app.controller('MemberProjectsCtrl', ['$scope', 'localStorageService', '$http', function($scope, localStorageService, $http){

@@ -18,6 +18,27 @@ var connection = require('../config/db').connection;
 //   })
 // })
 
+router.get('/details/:project_id', function(req, res){
+  res.render('individualproject', {title:" | Project Page"})
+})
+
+router.get('/page/:project_id', function(req,res){
+  connection.query('select * from (select u.username, u.user_id, m.admin_status, p.project_id, title,description from member_schema m inner join project_schema p on m.project_id=p.project_id inner join user_schema u on m.user_id=u.user_id) as t where t.admin_status=1 and t.project_id='+req.params.project_id, function(err, data){
+    console.log(data)
+    if(err) res.json({'error' : true, 'message' : err.message})
+    else res.json({'error' : false, 'message' : "Project fetched successfully", data:data})
+  })
+})
+
+router.get('/getnotices/project/:project_id', function(req,res){
+  var response = {}
+  var project_id = req.params.project_id
+  Project.getnotices(project_id, function(err, data){
+    if(err) res.json({error : true, message : err.message})
+    else res.json({error : false, message : "Notice fetch successful", data : data})
+  })
+})
+
 // done
 router.post('/create/:username', function(req, res){
   var response = {}
@@ -103,7 +124,7 @@ router.put('/acceptrequest/project/:project_id/user/:user_id/admin/:admin_id/:de
   
 })
 
-router.post('/createnotice/user/:user_id/project/project_id', function(req, res){
+router.post('/createnotice/user/:user_id/project/:project_id', function(req, res){
   var user_id = req.params.user_id
   var project_id = req.params.project_id
   var response = {}

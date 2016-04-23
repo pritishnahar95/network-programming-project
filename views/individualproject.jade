@@ -1,0 +1,48 @@
+extends layout
+
+block content
+    div(ng-controller="IndProjectCtrl")
+        h3 Title : {{project.title}}
+        h4 Description : {{project.description}}
+        h4 Admin : {{project.username}}
+        div(class="btn-group inline")
+            button(class="btn btn-success" type="button" data-toggle="modal" data-target="#modal1") Create Notice
+            div(class="modal fade" id="modal1" role="dialog")
+                div(class="modal-dialog")
+                    div(class="modal-content")
+                        div(class="modal-header")
+                            button(type="button" class="close" data-dismiss="modal") &times;
+                            h4(class="modal-title") Create Notice
+                        div(class="modal-body")
+                            form(class='form-horizontal',name='noticeform',role='form', novalidate)
+                                div(class = 'form-group')
+                                    label(class='control-label col-sm-2',for='content') Project Title:
+                                    div(class='col-sm-10')
+                                        input(class="form-control" id="title" ng-model="project.title"  disabled)
+                                div(class='form-group')
+                                    label(class='control-label col-sm-2',for='content') Content:
+                                    div(class='col-sm-10')
+                                        textarea(class='form-control' name='content', ng-model="notice.content" type='text',id='content', required)
+                                        span(style="color:red", ng-show="noticeform.content.$dirty && noticeform.content.$invalid")
+                                            span(ng-show="noticeform.content.$error.required") Content is required.
+                                        
+                                div(class='form-group')
+                                    div(class="span7 text-center")
+                                        button(type="submit" ng-disabled='noticeform.content.$invalid' class="btn btn-success",ng-click="createnotice()") Create Notice
+                                
+                                div(class='form-group')
+                                    div(class='span7 text-center')
+                                        h4(ng-show="error") {{errmessage}}
+
+            button(class="btn btn-success" type="button" data-toggle="modal" data-target="#modal2" ng-click="shownotices()") Show Notices
+            div(class="modal fade" id="modal2" role="dialog")
+                div(class="modal-dialog")
+                    div(class="modal-content")
+                        div(class="modal-header")
+                            button(type="button" class="close" data-dismiss="modal") &times;
+                            h4(class="modal-title") Notices
+                        div(class="modal-body")
+                            div(class='list-group')
+                                ul(class="list-group-item" ng-repeat="notice in data") 
+                                    p(class="list-group-item-text") {{notice.content}}
+                                    br
