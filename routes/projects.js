@@ -24,7 +24,6 @@ router.get('/details/:project_id', function(req, res){
 
 router.get('/page/:project_id', function(req,res){
   connection.query('select * from (select u.username, u.user_id, m.admin_status, p.project_id, title,description from member_schema m inner join project_schema p on m.project_id=p.project_id inner join user_schema u on m.user_id=u.user_id) as t where t.admin_status=1 and t.project_id='+req.params.project_id, function(err, data){
-    console.log(data)
     if(err) res.json({'error' : true, 'message' : err.message})
     else res.json({'error' : false, 'message' : "Project fetched successfully", data:data})
   })

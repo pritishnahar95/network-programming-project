@@ -2,7 +2,7 @@ extends layout
 
 block content
     h3 Login
-    form(class='form-horizontal',name='loginform',role='form', ng-controller='LoginCtrl', novalidate)
+    form(class='form-horizontal',name='loginform',role='form',ng-controller="LoginCtrl", novalidate)
     
         div(class='form-group')
             label(class='control-label col-sm-2',for='username') Username:
@@ -21,7 +21,7 @@ block content
         div(class='form-group')
             h4(class='span7 text-center') Don't have an account? 
                 a(href="/register") Register
-       
+    
         div(class='form-group')
             div(class="span7 text-center")
                 button(type="submit" ng-disabled='loginform.username.$invalid || loginform.password.$invalid' class="btn btn-success",ng-click="login()") Login

@@ -106,7 +106,6 @@ router.get('/getallprojects/:username', function(req, res){
     else{
       response = {'error' : false, 'message' : 'Projects fetched successfully', 'projects' : projects}
     }
-    console.log("response")
     res.status(code).json(response)
   }) 
 })
