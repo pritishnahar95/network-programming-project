@@ -129,18 +129,23 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
         $scope.errormessage = response.message
       }
       else{
+        for(var i = 0; i<localStorageService.get('admin_projects').length; i++){
+          if(response.data[0].project_id == localStorageService.get('admin_projects')[i].project_id){
+            $scope.flag = true
+            break
+          }
+        }
         $scope.project = response.data[0]
       }
     })
     
     $scope.shownotices = function(){
+      console.log($scope.project)
       $http({
         method: 'GET',
         url: 'http://10.3.11.34:3000/projects/getnotices/project/'+$scope.project.project_id
       }).
       success(function(response){
-        
-        console.log(response.message)
         if(response.error){
           $scope.errorValue = true
           $scope.errormessage = response.message
@@ -190,6 +195,7 @@ app.controller('MemberProjectsCtrl', ['$scope', 'localStorageService', '$http', 
         $scope.errormessage = response.message
       }
       else{
+        localStorageService.set('member_projects', response.projects)
         $scope.data = response.projects
       }
     })
