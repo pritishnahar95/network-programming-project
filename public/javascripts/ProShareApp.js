@@ -53,7 +53,6 @@ app.controller('ConfirmationCtrl', ['$scope', '$http', '$window', '$location', '
 app.controller('LoginCtrl', ['$scope', '$http', '$window', '$location', 'localStorageService', function($scope, $http, $window, $location, localStorageService){
   $scope.error = false
   $scope.login = function(){
-    
     $http({
       method: 'POST',
       url: 'http://10.3.11.34:3000/users'+$location.url(),
@@ -86,8 +85,35 @@ app.controller('IndexCtrl', ['$scope', '$window', 'localStorageService', '$http'
   }
 }])
 
-app.controller('DashboardCtrl', ['$scope', 'localStorageService', function($scope, localStorageService){
+app.controller('DashboardCtrl', ['$scope', 'localStorageService', '$http', function($scope, localStorageService, $http){
   $scope.username = localStorageService.get('user_info').user.username
+  $http({
+    method: 'GET',
+    url: 'http://10.3.11.34:3000/users/getprojects/'+localStorageService.get('user_info').user.username
+  }).
+  success(function(response){
+    if(response.error){
+      $scope.errorValue = true
+      $scope.errormessage = response.message
+    }
+    else{
+      localStorageService.set('admin_projects', response.projects)
+    }
+  })
+    
+  $http({
+    method: 'GET',
+    url: 'http://10.3.11.34:3000/users/getallprojects/'+localStorageService.get('user_info').user.username
+  }).
+  success(function(response){
+    if(response.error){
+      $scope.errorValue = true
+      $scope.errormessage = response.message
+    }
+    else{
+      localStorageService.set('member_projects', response.projects)
+    }
+  })
 }])
 
 // Controllers inside dashboard view.
@@ -111,7 +137,7 @@ app.controller('AdminProjectsCtrl', ['$scope', 'localStorageService', '$http', f
         $scope.errormessage = response.message
       }
       else{
-        localStorageService.set('admin_projects', response.projects)
+        //localStorageService.set('admin_projects', response.projects)
         $scope.data = response.projects
       }
     })
@@ -195,7 +221,7 @@ app.controller('MemberProjectsCtrl', ['$scope', 'localStorageService', '$http', 
         $scope.errormessage = response.message
       }
       else{
-        localStorageService.set('member_projects', response.projects)
+        //localStorageService.set('member_projects', response.projects)
         $scope.data = response.projects
       }
     })

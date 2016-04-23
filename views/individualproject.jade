@@ -6,7 +6,7 @@ block content
         h4 Description : {{project.description}}
         h4 Admin : {{project.username}}
         div(class="btn-group inline")
-            button(class="btn btn-success" type="button" data-toggle="modal" data-target="#modal1") Create Notice
+            button(class="btn btn-success" type="button" data-toggle="modal" ng-show="flag" data-target="#modal1") Create Notice
             div(class="modal fade" id="modal1" role="dialog")
                 div(class="modal-dialog")
                     div(class="modal-content")
