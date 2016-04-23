@@ -69,7 +69,6 @@ router.get('/projects/:branch/', function(req, res){
 		else{
 			response = {'error':false, title: " | Projects - " + branch, 'message':projects}
 		}
-    console.log(response)
 		res.render('projects', response)
 	})
 }) 
