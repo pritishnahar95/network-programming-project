@@ -64,11 +64,12 @@ router.get('/projects/:branch/', function(req, res){
   var branch = req.params.branch
 	Project.find_project_branch(branch, function(err,projects){	
 		if(err){
-			response = {'error':true, 'message':err.message} 
+			response = {'error':true, title: " | Projects", 'message':err.message} 
 		}
 		else{
-			response = {'error':false, 'data':projects}
+			response = {'error':false, title: " | Projects - " + branch, 'message':projects}
 		}
+    console.log(response)
 		res.render('projects', response)
 	})
 }) 
