@@ -1,0 +1,10 @@
+extends dashboard
+
+block dashboard-ui
+	div(ng-controller="RequestSentCtrl")
+		h3 Your pending requests.
+		div(ng-show="errorValue") {{errormessage}}
+		div(class='list-group')
+			ul(class="list-group-item" ng-show="!errorValue" ng-repeat="project in data") 
+				p(class="list-group-item-heading") {{project.title}}
+				p(class="list-group-item-text") Description: {{project.description}}

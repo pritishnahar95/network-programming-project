@@ -124,6 +124,9 @@ INSERT INTO branch_schema VALUES
 
 INSERT INTO tag_schema VALUES
         (1, 'wsn');
+	
+INSERT INTO request_schema VALUES
+        (1, 29, 1, 0);
 		
 SELECT * FROM user_schema UNION SELECT * FROM project_schema;
 
@@ -170,3 +173,5 @@ select u.username, p.title from member_schema n inner join user_schema u on u.us
 
 // non member project query
 select * from (select u.user_id, p.project_id, u.username, p.title from member_schema n inner join user_schema u on u.user_id=n.user_id inner join project_schema p on n.project_id=p.project_id ) as t where t.user_id!=40;
+
+select p.project_id, p.title from request_schema r inner join project_schema p on r.project_id=p.project_id;

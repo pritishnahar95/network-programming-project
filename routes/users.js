@@ -20,8 +20,8 @@ router.get('/dashboard/memberprojects', function(req, res){
   res.render('memberprojects', {title:" | Dashboard - Member Projects"})
 })
 
-router.get('/dashboard/projectrequests', function(req, res){
-  res.render('projectrequests', {title:" | Dashboard - Project Requests"})
+router.get('/dashboard/requestsent', function(req, res){
+  res.render('requestsent', {title:" | Dashboard - Requests Sent"})
 })
 
 router.get('/dashboard/projectinvites', function(req, res){
@@ -119,6 +119,16 @@ router.get('/otherprojects/:userid', function(req, res){
       response = {'error' : false, 'message' : "Project fetched successfully.", 'projects' : projects}
     }
     res.status(code).json(response)
+  })
+})
+
+router.get('/requestsent/:user_id', function(req, res){
+  var response = {}
+  var user_id = req.params.user_id
+  User.requestsent(user_id, function(err, projects){
+    if(err) response = {error : true, message : err.message}
+    else response = {error : false, message : 'Projects fetched successfully.', 'projects' : projects}
+    res.json(response)
   })
 })
 

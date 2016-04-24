@@ -261,8 +261,41 @@ app.controller('OtherProjectsCtrl', ['$scope', 'localStorageService', '$http', f
         $scope.errormessage = response.message
       }
       else{
-        console.log(response.projects)
         $scope.projects = response.projects
       }
     })
+    
+    // $http({
+    //   method: 'GET',
+    //   url: 'http://10.3.11.34:3000/users/requestssent/'+localStorageService.get('user_info').user.user_id
+    // }).
+    // success(function(response){
+    //   if(response.error){
+    //     $scope.errorValue = true
+    //     $scope.errormessage = response.message
+    //   }
+    //   else{
+    //     var requests = response.projects
+    //   }
+    // })
+    
+  }])
+
+app.controller('RequestSentCtrl', ['$scope', '$http', 'localStorageService', function($scope, $http, localStorageService){
+  console.log("here")
+  $scope.errorValue = false
+  $http({
+    method: 'GET',
+    url: 'http://10.3.11.34:3000/users/requestsent/'+localStorageService.get('user_info').user.user_id
+  }).
+  success(function(response){
+    console.log(response)
+    if(response.error){
+      $scope.errorValue = true
+      $scope.errormessage = response.message
+    }
+    else{
+      $scope.data = response.projects
+    }
+  })
 }])

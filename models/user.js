@@ -255,13 +255,19 @@ module.exports = {
 		})
 	},
 	
-	// bug
 	otherprojects :function(user_id, callback){
-		// not checking validity of user
 		var member_query = 'select * from (select u.user_id, p.project_id, u.username, p.title, p.description from member_schema n inner join user_schema u on u.user_id=n.user_id inner join project_schema p on n.project_id=p.project_id ) as t where t.user_id!=' + user_id
 		connection.query(member_query, function(err, projects){
 			if(err) callback(err, null)
 			else callback(null, projects)
+		})
+	},
+	
+	requestsent : function(user_id, callback){
+		var request_query = 'select * from (select r.request_id, r.user_id, p.project_id, p.title, p.description, r.sender_status from request_schema r inner join project_schema p on r.project_id=p.project_id) as u where u.sender_status=0 and u.user_id=' + user_id + ' order by request_id desc'
+		connection.query(request_query, function(err, projects){
+			if(err) callback(err, null)
+			else callback(null,projects)
 		})
 	}
 };
