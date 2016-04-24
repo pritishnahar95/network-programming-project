@@ -29,6 +29,13 @@ router.get('/page/:project_id', function(req,res){
   })
 })
 
+router.get('/page/usersrequesting/:project_id', function(req,res){
+  connection.query('select * from (select u.username, u.user_id, r.project_id, r.sender_status from request_schema r inner join user_schema u on r.user_id=u.user_id) as s where s.sender_status=0 and s.project_id='+req.params.project_id, function(err, data){
+    if(err) res.json({'error' : true, 'message' : err.message})
+    else res.json({'error' : false, 'message' : "Users fetched successfully", data:data})
+  })
+})
+
 router.get('/getnotices/project/:project_id', function(req,res){
   var response = {}
   var project_id = req.params.project_id
@@ -109,7 +116,6 @@ router.put('/acceptrequest/project/:project_id/user/:user_id/admin/:admin_id/:de
   var admin_id = req.params.admin_id
   
   Project.accept_request(project_id, user_id, admin_id, decision, function(err,data){
-    
     if(err){
       code = 400
       response = {'error' : true, 'message' : err.message}
@@ -119,7 +125,6 @@ router.put('/acceptrequest/project/:project_id/user/:user_id/admin/:admin_id/:de
     }
     res.status(code).json(response)
   })
-  
 })
 
 router.post('/createnotice/user/:user_id/project/:project_id', function(req, res){

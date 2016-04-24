@@ -232,6 +232,16 @@ module.exports = {
 															})
 														}		
 													})	
+												}
+												else{
+													connection.commit(function(err){
+														if(err){
+															connection.rollback(function(){
+																callback(err, null)
+															})
+														}
+														else callback(null, null)
+													})
 												}	
 											}
 										})	

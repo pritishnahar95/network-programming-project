@@ -162,6 +162,20 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
       }
     })
     
+    $http({
+      method: 'GET',
+      url: 'http://10.3.11.34:3000/projects/page/usersrequesting/'+$location.url().split("/")[3]
+    }).
+    success(function(response){
+      if(response.error){
+        $scope.errorValue = true
+        $scope.errormessage = response.message
+      }
+      else{
+        $scope.users = response.data
+      }
+    })
+    
     $scope.shownotices = function(){
       $http({
         method: 'GET',
@@ -199,6 +213,27 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
         }
         else{
           $window.location.href = '/users/dashboard/adminprojects'
+        }
+      })
+    }
+    
+    $scope.acceptrequest = function(project_id, user_id, decision){
+      // console.log(project_id)
+      // console.log(user_id)
+      // console.log(decision)
+      // console.log(localStorageService.get('user_info').user.user_id)
+      $http({
+        method: 'PUT',
+        url: 'http://10.3.11.34:3000/projects/acceptrequest/project/'+project_id+'/user/'+user_id+'/admin/'+localStorageService.get('user_info').user.user_id+'/'+decision
+      }).
+      success(function(response){
+        if(response.error){
+          $scope.error = response.error;
+          $scope.errmessage = response.message;
+        }
+        else{
+          console.log(response)
+          $window.location.reload()
         }
       })
     }

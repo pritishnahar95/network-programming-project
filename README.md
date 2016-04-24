@@ -175,3 +175,4 @@ select u.username, p.title from member_schema n inner join user_schema u on u.us
 select * from (select u.user_id, p.project_id, u.username, p.title from member_schema n inner join user_schema u on u.user_id=n.user_id inner join project_schema p on n.project_id=p.project_id ) as t where t.user_id!=40;
 
 select p.project_id, p.title from request_schema r inner join project_schema p on r.project_id=p.project_id;
+select u.username, u.user_id from request_schema r inner join user_schema u on r.user_id=u.user_id;

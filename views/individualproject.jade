@@ -45,4 +45,14 @@ block content
                             div(class='list-group')
                                 ul(class="list-group-item" ng-repeat="notice in data") 
                                     p(class="list-group-item-text") {{notice.content}}
-                                    br
+                                    hr
+            hr
+            
+            h4(ng-show="flag") Users Requesting to Join {{project.project_id}}
+                div(ng-show="errorValue") {{errormessage}}
+
+                ul(ng-show="!errorValue" ng-repeat="user in users") 
+                    li {{user.username}}
+                        div(btn-group inline)
+                            button(class="btn btn-success" ng-click="acceptrequest(project.project_id, user.user_id, 1)") Accept
+                            button(class="btn btn-success" ng-click="acceptrequest(project.project_id, user.user_id, 0)") Reject
