@@ -50,7 +50,6 @@ router.post('/create/:username', function(req, res){
   if(s === "Chem") branch_id=4
   Project.create_project(req.body, branch_id, username, function(err, projectid){
     if(err){
-      console.log(err)
       response = {'error' : true, 'message' : err.message}
     }
     else {

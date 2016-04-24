@@ -8,5 +8,6 @@ block dashboard-ui
 			h4(class="list-group-item-heading") {{project.title}}
 			p(class="list-group-item-text") Description: {{project.description}}
 			p(class="list-group-item-text") Admin: {{project.username}}
+			button(class="btn btn-success right" ng-click="sendrequest(project.project_id)") Send Request
 			
 		

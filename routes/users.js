@@ -2,7 +2,7 @@ var express = require('express')
 var router = express.Router()
 var User = require('../models/user')
 var Project = require('../models/project')
-
+var _ = require('lodash')
 // get functions
 router.get('/dashboard', function(req, res){
   res.render('dashboard', {title:" | Dashboard"})
@@ -59,20 +59,17 @@ router.put('/acceptinvite/project/:projectid/:userid/:decision', function(req,re
 // done
 router.put('/sendrequest/:username/project/:projectpk', function(req,res){
   var response = {}
-  var code = 200
   var projectpk = req.params.projectpk
   var username = req.params.username
 
   User.send_request(username, projectpk, function(err, data){
     if(err){
-      code = 400
       response = {'error' : true , 'message' : err.message}
     }
     else{
-      // bug
       response = {'error' : false, 'message' : "Request sent to admin successfully."}
     }
-    res.status(code).json(response)
+    res.json(response)
   })
 })
 
@@ -108,17 +105,24 @@ router.get('/getallprojects/:username', function(req, res){
 
 router.get('/otherprojects/:userid', function(req, res){
   var response = {}
-  var code = 200
+  var otherprojects;
+  var requestsent;
   var user_id = req.params.userid
   User.otherprojects(user_id, function(err, projects){
     if(err){
-      code = 400
       response = {'error' : true, 'message' : err.message}
     }
     else{
-      response = {'error' : false, 'message' : "Project fetched successfully.", 'projects' : projects}
+      otherprojects = projects
     }
-    res.status(code).json(response)
+    User.requestsent(user_id, function(err, projects){
+      if(err) response = {error : true, message : err.message}
+      else {
+        requestsent = projects
+        response = {error:false, message : 'Projects fetched successfully.', projects : _.differenceBy(otherprojects, requestsent, 'project_id')};
+      }
+      res.json(response)
+    })
   })
 })
 
