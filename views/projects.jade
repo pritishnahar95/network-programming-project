@@ -2,35 +2,28 @@ extends layout
 
 block content
 
-	h3 EEE Projects 
-		a(href="/projects/eee")
-			span(class="label label-default") Explore
+	div(id="content")
+		div(class="A")
+			| 
+			h4(class="heading") EEE Projects 
+				a(href="/projects/eee")
+					span(class="label label-default explore") Explore
+		div(class="B") 	
+			|	
+			h4(class="heading") CSE Projects 
+				a(href="/projects/cse")
+					span(class="label label-default explore") Explore
+		div(class="C") 	
+			|	
+			h4(class="heading") Mechanical Engineering Projects 
+				a(href="/projects/mech")
+					span(class="label label-default explore") Explore
+		div(class="D")
+			| 		
+			h4(class="heading") Chemical Engineering Projects 
+				a(href="/projects/chem")
+					span(class="label label-default explore") Explore
 			
-	h3 CSE Projects 
-		a(href="/projects/cse")
-			span(class="label label-default") Explore
-			
-	h3 Mechanical Engineering Projects 
-		a(href="/projects/mechanical")
-			span(class="label label-default") Explore
-			
-	h3 Chemical Engineering Projects 
-		a(href="/projects/chemical")
-			span(class="label label-default") Explore
-			
-	hr
 
-	h2 All Projects
-	if error
-		h1 Error
-	else
-		each val in message
-			div(class='list-group')
-				p(class="list-group-item") Title : 
-					a(href='#')=  val.title
-				p(class="list-group-item") Description : 
-					a(href='#')=  val.description
-				p(class="list-group-item") Admin : 
-					a(href='#')=  val.username
 				
 			

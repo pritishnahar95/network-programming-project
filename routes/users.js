@@ -69,6 +69,7 @@ router.put('/sendrequest/:username/project/:projectpk', function(req,res){
     else{
       response = {'error' : false, 'message' : "Request sent to admin successfully."}
     }
+    console.log(response)
     res.json(response)
   })
 })
@@ -119,6 +120,8 @@ router.get('/otherprojects/:userid', function(req, res){
       if(err) response = {error : true, message : err.message}
       else {
         requestsent = projects
+        console.log(otherprojects)
+        console.log(requestsent)
         response = {error:false, message : 'Projects fetched successfully.', projects : _.differenceBy(otherprojects, requestsent, 'project_id')};
       }
       res.json(response)

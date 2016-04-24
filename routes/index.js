@@ -48,15 +48,15 @@ router.get('/confirmation/:userid', function(req,res){
 //working
 router.get('/projects', function(req, res){
 	var response = {}
-	Project.find_all(function(err, projects){	
-		if(err){
-			response = {error:true, title: " | Projects", message:err.message} 
-		}
-		else{
-			response = {error:false, title: " | Projects", message:projects}
-		}
-		res.render('projects', response)
-	})
+	// Project.find_all(function(err, projects){	
+	// 	if(err){
+	// 		response = {error:true, title: " | Projects", message:err.message} 
+	// 	}
+	// 	else{
+	// 		response = {error:false, title: " | Projects", message:projects}
+	// 	}
+		res.render('projects', {title:" | Projects"})
+	// })
 })
 
 router.get('/projects/:branch/', function(req, res){
@@ -69,7 +69,7 @@ router.get('/projects/:branch/', function(req, res){
 		else{
 			response = {'error':false, title: " | Projects - " + branch, 'message':projects}
 		}
-		res.render('projects', response)
+		res.render('branchprojects', response)
 	})
 }) 
 

@@ -25,6 +25,10 @@ body {
   float: left;
 }
 
+.list-small{
+  height : 50px !important;  
+}
+
 .list-group-item{
   height: 100px;  
 }
@@ -44,4 +48,54 @@ body {
 
 a {
   color: #ffffff;
+}
+
+.heading{
+  padding: 20px;
+}
+
+.explore{
+  margin-left: 20px;
+}
+
+#content {
+    margin-top: 100px;
+}
+
+#content .A {
+  border: 1px solid;
+  border-color: #03051B;
+  width:50%;
+  height: 50%;
+  float: left;
+}
+
+#content .B {
+  border: 1px solid;
+  border-color: #03051B;
+  width:50%;
+  height: 50%;
+  float: left;
+}
+
+#content .C {
+  border: 1px solid;
+  border-color: #03051B;
+  width:50%;
+  height: 50%;
+  float: left;
+}
+
+#content .D {
+  border: 1px solid;
+  border-color: #03051B;
+  width:50%;
+  height: 50%;
+  float: left;
+}
+
+#content, #content > div {
+    -webkit-box-sixing: border-box;
+    -moz-box-sizing: border-box; 
+    box-sizing: border-box;
 }

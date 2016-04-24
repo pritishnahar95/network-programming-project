@@ -5,7 +5,6 @@ var app = angular.module('ProShareApp', ['LocalStorageModule'], function($locati
   });
 });
 
-
 app.config(function (localStorageServiceProvider) {
   localStorageServiceProvider
     .setPrefix('ProSharePrefix');
@@ -32,7 +31,7 @@ app.controller('ConfirmationCtrl', ['$scope', '$http', '$window', '$location', '
   $scope.confirm = function(){
     $http({
       method: 'POST',
-      url: 'http://10.3.11.34:3000/users'+$location.url(),
+      url: '/users'+$location.url(),
       data: {conf_key: $scope.confkey},
     }).
     success(function(response){
@@ -54,7 +53,7 @@ app.controller('LoginCtrl', ['$scope', '$http', '$window', '$location', 'localSt
   $scope.login = function(){
     $http({
       method: 'POST',
-      url: 'http://10.3.11.34:3000/users'+$location.url(),
+      url: '/users'+$location.url(),
       data: $scope.user,
     }).
     success(function(response){
@@ -85,7 +84,7 @@ app.controller('DashboardCtrl', ['$scope', 'localStorageService', '$http', funct
   $scope.username = localStorageService.get('user_info').user.username
   $http({
     method: 'GET',
-    url: 'http://10.3.11.34:3000/users/getprojects/'+localStorageService.get('user_info').user.username
+    url: '/users/getprojects/'+localStorageService.get('user_info').user.username
   }).
   success(function(response){
     if(response.error){
@@ -99,7 +98,7 @@ app.controller('DashboardCtrl', ['$scope', 'localStorageService', '$http', funct
     
   $http({
     method: 'GET',
-    url: 'http://10.3.11.34:3000/users/getallprojects/'+localStorageService.get('user_info').user.username
+    url: '/users/getallprojects/'+localStorageService.get('user_info').user.username
   }).
   success(function(response){
     if(response.error){
@@ -126,7 +125,7 @@ app.controller('AdminProjectsCtrl', ['$scope', 'localStorageService', '$http', f
     $scope.errorValue = false
     $http({
       method: 'GET',
-      url: 'http://10.3.11.34:3000/users/getprojects/'+$scope.username
+      url: '/users/getprojects/'+$scope.username
     }).
     success(function(response){
       if(response.error){
@@ -144,7 +143,7 @@ app.controller('AdminProjectsCtrl', ['$scope', 'localStorageService', '$http', f
 app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$location', '$window', function($scope, localStorageService, $http, $location, $window){
     $http({
       method: 'GET',
-      url: 'http://10.3.11.34:3000/projects/page/'+$location.url().split("/")[3]
+      url: '/projects/page/'+$location.url().split("/")[3]
     }).
     success(function(response){
       if(response.error){
@@ -164,7 +163,7 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
     
     $http({
       method: 'GET',
-      url: 'http://10.3.11.34:3000/projects/page/usersrequesting/'+$location.url().split("/")[3]
+      url: '/projects/page/usersrequesting/'+$location.url().split("/")[3]
     }).
     success(function(response){
       if(response.error){
@@ -179,7 +178,7 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
     $scope.shownotices = function(){
       $http({
         method: 'GET',
-        url: 'http://10.3.11.34:3000/projects/getnotices/project/'+$scope.project.project_id
+        url: '/projects/getnotices/project/'+$scope.project.project_id
       }).
       success(function(response){
         if(response.error){
@@ -193,7 +192,7 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
     }
    
     $scope.createnotice = function(){
-      var url = 'http://10.3.11.34:3000/projects/createnotice/user/'+localStorageService.get('user_info').user.user_id + '/project/' + $scope.project.project_id
+      var url = '/projects/createnotice/user/'+localStorageService.get('user_info').user.user_id + '/project/' + $scope.project.project_id
       $http({
         method: 'POST',
         url: url,
@@ -224,7 +223,7 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
       // console.log(localStorageService.get('user_info').user.user_id)
       $http({
         method: 'PUT',
-        url: 'http://10.3.11.34:3000/projects/acceptrequest/project/'+project_id+'/user/'+user_id+'/admin/'+localStorageService.get('user_info').user.user_id+'/'+decision
+        url: '/projects/acceptrequest/project/'+project_id+'/user/'+user_id+'/admin/'+localStorageService.get('user_info').user.user_id+'/'+decision
       }).
       success(function(response){
         if(response.error){
@@ -242,7 +241,7 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
 app.controller('MemberProjectsCtrl', ['$scope', 'localStorageService', '$http', function($scope, localStorageService, $http){
     $http({
       method: 'GET',
-      url: 'http://10.3.11.34:3000/users/getallprojects/'+$scope.username
+      url: '/users/getallprojects/'+$scope.username
     }).
     success(function(response){
       if(response.error){
@@ -260,7 +259,7 @@ app.controller('CreateProjectCtrl', ['$scope', 'localStorageService', '$http', '
     $scope.create = function(){
       $http({
         method: 'POST',
-        url: 'http://10.3.11.34:3000/projects/create/'+localStorageService.get('user_info').user.username,
+        url: '/projects/create/'+localStorageService.get('user_info').user.username,
         data: {title: $scope.project.title, description: $scope.project.description, branchname:$scope.project.branchname}
       }).
       success(function(response){
@@ -279,7 +278,7 @@ app.controller('OtherProjectsCtrl', ['$scope', 'localStorageService', '$http', '
   $scope.errorValue = false
   $http({
     method: 'GET',
-    url: 'http://10.3.11.34:3000/users/otherprojects/'+localStorageService.get('user_info').user.user_id
+    url: '/users/otherprojects/'+localStorageService.get('user_info').user.user_id
   }).
   success(function(response){
     if(response.error){
@@ -294,15 +293,17 @@ app.controller('OtherProjectsCtrl', ['$scope', 'localStorageService', '$http', '
   $scope.sendrequest = function(id){
     $http({
       method: 'PUT',
-      url: 'http://10.3.11.34:3000/users/sendrequest/'+localStorageService.get('user_info').user.username+'/project/'+id
+      url: '/users/sendrequest/'+localStorageService.get('user_info').user.username+'/project/'+id
     }).
     success(function(response){
+      console.log(response)
       if(response.error){
-        $scope.errorValue = true
-        $scope.errormessage = response.message
+        $window.location.href = '/users/dashboard/otherprojects'
+        // $scope.errorValue = true
+        // $scope.errormessage = response.message
       }
       else{
-        $window.location.reload()
+        $window.location.href = '/users/dashboard/requestsent'
       }
     })
   }
@@ -312,7 +313,7 @@ app.controller('RequestSentCtrl', ['$scope', '$http', 'localStorageService', fun
   $scope.errorValue = false
   $http({
     method: 'GET',
-    url: 'http://10.3.11.34:3000/users/requestsent/'+localStorageService.get('user_info').user.user_id
+    url: '/users/requestsent/'+localStorageService.get('user_info').user.user_id
   }).
   success(function(response){
     if(response.error){

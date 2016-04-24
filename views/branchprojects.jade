@@ -1,0 +1,16 @@
+extends layout
+
+block content
+
+	h3 Project Information
+	if error
+		h4= error
+	else
+		each val in message
+			div(class='list-group')
+				p(class="list-small list-group-item") Title : 
+					label=  val.title
+				p(class="list-small list-group-item") Description : 
+					label=  val.description
+				// p(class="list-small list-group-item") Admin : 
+				// 	label=  val.username

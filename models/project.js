@@ -150,7 +150,7 @@ module.exports = {
 				var query = 'SELECT project_schema.project_id,title,description ' +
         					'FROM project_schema,branch_project_schema,branch_schema ' +
         					'WHERE branch_schema.branch_id = ' + branch_id + 
-							' AND branch_schema.branch_id = branch_project_schema.branch_id AND project_schema.project_id = branch_project_schema.project_id'
+							' AND branch_schema.branch_id = branch_project_schema.branch_id AND project_schema.project_id = branch_project_schema.project_id order by project_schema.project_id desc'
 				connection.query(query, function(err, data){
 					if(err) callback(err, null)
 					else callback(null, data)
