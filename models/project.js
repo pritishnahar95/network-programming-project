@@ -28,6 +28,7 @@ module.exports = {
 									admin_status : 1
 								}
 								connection.query('INSERT INTO member_schema SET ?', member_obj, function(err, member){
+									
 									if(err){
 										connection.rollback(function(err){
 											if(err) callback(err, null)
@@ -39,6 +40,7 @@ module.exports = {
 											branch_id : branch_id
 										}
 										connection.query('INSERT INTO branch_project_schema SET ?', project_branch_obj, function(err, object){
+											console.log(err)
 											if(err){
 												connection.rollback(function(err){
 													if(err) callback(err, null)

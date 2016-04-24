@@ -114,6 +114,7 @@ app.controller('DashboardCtrl', ['$scope', 'localStorageService', '$http', funct
       localStorageService.set('member_projects', response.projects)
     }
   })
+  //console.log(localStorageService.get('admin_projects'))
 }])
 
 // Controllers inside dashboard view.
@@ -127,6 +128,7 @@ app.controller('UserDetailsCtrl', ['$scope', 'localStorageService', function($sc
 }])
 
 app.controller('AdminProjectsCtrl', ['$scope', 'localStorageService', '$http', function($scope, localStorageService, $http){
+    $scope.errorValue = false
     $http({
       method: 'GET',
       url: 'http://10.3.11.34:3000/users/getprojects/'+$scope.username
@@ -235,6 +237,7 @@ app.controller('CreateProjectCtrl', ['$scope', 'localStorageService', '$http', '
         data: {title: $scope.project.title, description: $scope.project.description, branchname:$scope.project.branchname}
       }).
       success(function(response){
+        console.log(response)
         if(response.error){
           $scope.error = response.error;
           $scope.errmessage = response.message;
@@ -247,7 +250,7 @@ app.controller('CreateProjectCtrl', ['$scope', 'localStorageService', '$http', '
 }])
 
 app.controller('OtherProjectsCtrl', ['$scope', 'localStorageService', '$http', function($scope, localStorageService, $http){
-    console.log(localStorageService.get('user_info').user.user_id)
+    $scope.errorValue = false
     $http({
       method: 'GET',
       url: 'http://10.3.11.34:3000/users/otherprojects/'+localStorageService.get('user_info').user.user_id
@@ -258,6 +261,7 @@ app.controller('OtherProjectsCtrl', ['$scope', 'localStorageService', '$http', f
         $scope.errormessage = response.message
       }
       else{
+        console.log(response.projects)
         $scope.projects = response.projects
       }
     })

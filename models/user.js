@@ -258,10 +258,7 @@ module.exports = {
 	// bug
 	otherprojects :function(user_id, callback){
 		// not checking validity of user
-		var member_query = 'SELECT title, description' +
-        				' FROM project_schema, member_schema'+
-        				' WHERE member_schema.user_id != ' + user_id +
-						' AND project_schema.project_id = member_schema.project_id'
+		var member_query = 'select * from (select u.user_id, p.project_id, u.username, p.title, p.description from member_schema n inner join user_schema u on u.user_id=n.user_id inner join project_schema p on n.project_id=p.project_id ) as t where t.user_id!=' + user_id
 		connection.query(member_query, function(err, projects){
 			if(err) callback(err, null)
 			else callback(null, projects)

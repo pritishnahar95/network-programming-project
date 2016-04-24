@@ -79,34 +79,30 @@ router.put('/sendrequest/:username/project/:projectpk', function(req,res){
 // admin level projects
 router.get('/getprojects/:username', function(req, res){
   var response = {}
-  var code = 200
   var username = req.params.username
   User.getprojects(username, function(err, projects){
     if(err){
-      code = 400
       response = {'error' : true, 'message' : err.message}
     }
     else{
       response = {'error' : false, 'message' : 'Projects fetched successfully', 'projects' : projects}
     }
-    res.status(code).json(response)
+    res.json(response)
   }) 
 })
 
 // member level projects
 router.get('/getallprojects/:username', function(req, res){
   var response = {}
-  var code = 200
   var username = req.params.username
   User.getallprojects(username, function(err, projects){
     if(err){
-      code = 400
       response = {'error' : true, 'message' : err.message}
     }
     else{
       response = {'error' : false, 'message' : 'Projects fetched successfully', 'projects' : projects}
     }
-    res.status(code).json(response)
+    res.json(response)
   }) 
 })
 

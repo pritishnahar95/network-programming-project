@@ -7,5 +7,6 @@ block dashboard-ui
 		ul(class="list-group-item" ng-show="!errorValue" ng-repeat="project in projects") 
 			h4(class="list-group-item-heading") {{project.title}}
 			p(class="list-group-item-text") Description: {{project.description}}
+			p(class="list-group-item-text") Admin: {{project.username}}
 			
 		

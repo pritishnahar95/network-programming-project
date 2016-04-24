@@ -41,7 +41,6 @@ router.get('/getnotices/project/:project_id', function(req,res){
 // done
 router.post('/create/:username', function(req, res){
   var response = {}
-  var code = 200
   var username = req.params.username
   var branch_id = 0
   var s = req.body.branchname
@@ -51,12 +50,13 @@ router.post('/create/:username', function(req, res){
   if(s === "Chem") branch_id=4
   Project.create_project(req.body, branch_id, username, function(err, projectid){
     if(err){
+      console.log(err)
       response = {'error' : true, 'message' : err.message}
     }
     else {
       response = {'error' : false, 'message' : "Project created successfully."}
     }
-    res.status(code).json(response)
+    res.json(response)
   })
 })
 
