@@ -255,6 +255,41 @@ app.controller('MemberProjectsCtrl', ['$scope', 'localStorageService', '$http', 
     })
 }])
 
+app.controller('ProjectInvitesCtrl', ['$scope', 'localStorageService', '$http', '$window', function($scope, localStorageService, $http, $window){
+    $http({
+      method: 'GET',
+      url: '/users/getinvites/user/'+localStorageService.get('user_info').user.user_id
+    }).
+    success(function(response){
+      console.log(response)
+      if(response.error){
+        $scope.errorValue = true
+        $scope.errormessage = response.message
+      }
+      else{
+        //localStorageService.set('member_projects', response.projects)
+        $scope.data = response.data
+      }
+    })
+    
+    $scope.acceptinvite = function(project_id, decision){
+      var url = '/users/acceptinvite/project/'+project_id+'/'+localStorageService.get('user_info').user.user_id+'/'+decision
+      console.log(url)
+      $http({
+        method: 'PUT',
+        url: url
+      }).success(function(response){
+        if(response.error){
+          console.log(response)
+        }
+        else{
+          $window.location.reload()
+        }
+      })
+    }
+    
+}])
+
 app.controller('CreateProjectCtrl', ['$scope', 'localStorageService', '$http', '$window', function($scope, localStorageService, $http, $window){
     $scope.create = function(){
       $http({
@@ -263,6 +298,7 @@ app.controller('CreateProjectCtrl', ['$scope', 'localStorageService', '$http', '
         data: {title: $scope.project.title, description: $scope.project.description, branchname:$scope.project.branchname}
       }).
       success(function(response){
+        console.log(response)
         if(response.error){
           $scope.error = response.error;
           $scope.errmessage = response.message;

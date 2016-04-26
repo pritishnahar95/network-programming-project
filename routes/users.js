@@ -120,8 +120,6 @@ router.get('/otherprojects/:userid', function(req, res){
       if(err) response = {error : true, message : err.message}
       else {
         requestsent = projects
-        console.log(otherprojects)
-        console.log(requestsent)
         response = {error:false, message : 'Projects fetched successfully.', projects : _.differenceBy(otherprojects, requestsent, 'project_id')};
       }
       res.json(response)
@@ -135,6 +133,20 @@ router.get('/requestsent/:user_id', function(req, res){
   User.requestsent(user_id, function(err, projects){
     if(err) response = {error : true, message : err.message}
     else response = {error : false, message : 'Projects fetched successfully.', 'projects' : projects}
+    res.json(response)
+  })
+})
+
+router.get('/getinvites/user/:user_id', function(req,res){
+  var response = {}
+  var user_id = req.params.user_id
+  User.get_invites(user_id, function(err, data){
+    if(err){
+      response = {'error' : true , 'message' : err.message}
+    }
+    else{
+      response = {'error' : false, 'message' : "invites fetched successfully", "data" : data}
+    }
     res.json(response)
   })
 })

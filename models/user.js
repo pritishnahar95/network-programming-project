@@ -207,6 +207,16 @@ module.exports = {
 											}		
 										})									
 									}
+									else{
+										connection.commit(function(err){
+											if(err){
+												connection.rollback(function(){
+													callback(err, null)
+												})
+											}
+											else callback(null, member_obj)
+										})
+									}
 								}
 							})
 						}
@@ -256,7 +266,7 @@ module.exports = {
 	},
 	
 	otherprojects :function(user_id, callback){
-		var member_query = 'select * from (select u.user_id, p.project_id, u.username, p.title, p.description from member_schema n inner join user_schema u on u.user_id=n.user_id inner join project_schema p on n.project_id=p.project_id ) as t where t.user_id!=' + user_id
+		var member_query = 'select m.user_id, m.project_id, u.username, p.title, p.description from (select * from member_schema where project_id not in (select project_id from member_schema where user_id='+user_id+')) m inner join user_schema u on u.user_id=m.user_id inner join project_schema p on p.project_id = m.project_id'
 		connection.query(member_query, function(err, projects){
 			if(err) callback(err, null)
 			else callback(null, projects)
@@ -268,6 +278,14 @@ module.exports = {
 		connection.query(request_query, function(err, projects){
 			if(err) callback(err, null)
 			else callback(null,projects)
+		})
+	},
+	
+	get_invites : function(user_id, callback){
+		var invite_query = 'select p.title, p.description, p.project_id from ((select * from request_schema where user_id='+user_id+' and sender_status=1) m inner join project_schema p on p.project_id=m.project_id)'
+		connection.query(invite_query, function(err, data){
+			if(err) callback(err, null)
+			else callback(null, data)
 		})
 	}
 };
