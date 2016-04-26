@@ -3,8 +3,8 @@ extends dashboard
 block dashboard-ui
 	div(ng-controller="RequestSentCtrl")
 		h4 Your pending requests.
-		div(ng-show="errorValue") {{errormessage}}
+		p {{error}}
 		div(class='list-group')
-			ul(class="list-group-item small-ht" ng-show="!errorValue" ng-repeat="project in data") 
+			ul(class="list-group-item small-ht" ng-repeat="project in data") 
 				h4(class="list-group-item-heading") {{project.title}}
 				p(class="list-group-item-text") Description : {{project.description}}

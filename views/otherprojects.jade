@@ -2,9 +2,9 @@ extends dashboard
 
 block dashboard-ui
 	h4 Projects in which you might be interested.
-	div(ng-show="errorValue") {{errormessage}}
+	p {{error}}
 	div(class='list-group' ng-controller="OtherProjectsCtrl")
-		ul(class="list-group-item med-ht" ng-show="!errorValue" ng-repeat="project in projects") 
+		ul(class="list-group-item med-ht" ng-repeat="project in projects") 
 			button(class="btn btn-success right" ng-click="sendrequest(project.project_id)") Send Request
 			h4(class="list-group-item-heading") {{project.title}}
 			p(class="list-group-item-text") Description: {{project.description}}

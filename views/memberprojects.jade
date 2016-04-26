@@ -3,8 +3,8 @@ extends dashboard
 block dashboard-ui
 	div(ng-controller="MemberProjectsCtrl")
 		h4 Projects in which you have member level rights.
-		div(ng-show="errorValue") {{errormessage}}
+		p {{error}}
 		div(class='list-group')
-			ul(class="list-group-item small-ht" ng-show="!errorValue" ng-repeat="project in data") 
+			ul(class="list-group-item small-ht" ng-repeat="project in data") 
 				a(href="/projects/details/{{project.project_id}}" class="list-group-item-heading") {{project.title}}
 				p(class="list-group-item-text") Description: {{project.description}}

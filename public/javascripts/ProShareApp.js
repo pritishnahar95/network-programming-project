@@ -12,12 +12,10 @@ app.config(function (localStorageServiceProvider) {
 
 
 app.controller('RegisterCtrl', ['$scope','$http', '$window', 'localStorageService', function($scope, $http, $window, localStorageService){
-  $scope.error = false
   $scope.register = function(){
     $http.post('/users/register', $scope.user).success(function(response){
       if(response.error){
         $scope.error = response.error;
-        $scope.errmessage = response.message;
       }
       else{
         $window.location.href = '/confirmation/' + response.data;
@@ -27,7 +25,6 @@ app.controller('RegisterCtrl', ['$scope','$http', '$window', 'localStorageServic
 }]);
 
 app.controller('ConfirmationCtrl', ['$scope', '$http', '$window', '$location', 'localStorageService', function($scope, $http, $window, $location, localStorageService){
-  $scope.error = false
   $scope.confirm = function(){
     $http({
       method: 'POST',
@@ -37,11 +34,11 @@ app.controller('ConfirmationCtrl', ['$scope', '$http', '$window', '$location', '
     success(function(response){
       if(response.error){
         $scope.error = response.error;
-        $scope.errmessage = response.message;
       }
       else{
         localStorageService.set('user_info', response)
         localStorageService.set('loggedin', true)
+        localStorageService.cookie.set('x-access-token', response.token)
         $window.location.href = '/'
       }
     })   
@@ -50,18 +47,16 @@ app.controller('ConfirmationCtrl', ['$scope', '$http', '$window', '$location', '
 
 app.controller('LoginCtrl', ['$scope', '$http', '$window', '$location', 'localStorageService', function($scope, $http, $window, $location, localStorageService){
   localStorageService.set('loggedin', false)
-  $scope.error = false
   $scope.login = function(){
     $http({
       method: 'POST',
-      url: 'http://10.3.11.34:3000/users'+$location.url(),
+      url: '/users'+$location.url(),
       data: $scope.user,
     }).
     success(function(response){
       console.log(response)
       if(response.error){
         $scope.error = response.error;
-        $scope.errmessage = response.message;
       }
       else{
         localStorageService.set('user_info', response)
@@ -90,8 +85,8 @@ app.controller('DashboardCtrl', ['$scope', 'localStorageService', '$http', funct
   }).
   success(function(response){
     if(response.error){
-      $scope.errorValue = true
-      $scope.errormessage = response.message
+      console.log(response)
+      // $scope.error = response.message
     }
     else{
       localStorageService.set('admin_projects', response.projects)
@@ -104,8 +99,8 @@ app.controller('DashboardCtrl', ['$scope', 'localStorageService', '$http', funct
   }).
   success(function(response){
     if(response.error){
-      $scope.errorValue = true
-      $scope.errormessage = response.message
+      console.log(response)
+      // $scope.error = response.message
     }
     else{
       localStorageService.set('member_projects', response.projects)
@@ -124,18 +119,15 @@ app.controller('UserDetailsCtrl', ['$scope', 'localStorageService', function($sc
 }])
 
 app.controller('AdminProjectsCtrl', ['$scope', 'localStorageService', '$http', function($scope, localStorageService, $http){
-    $scope.errorValue = false
     $http({
       method: 'GET',
       url: '/users/getprojects/'+$scope.username
     }).
     success(function(response){
       if(response.error){
-        $scope.errorValue = true
-        $scope.errormessage = response.message
+        $scope.error = response.message
       }
       else{
-        //localStorageService.set('admin_projects', response.projects)
         $scope.data = response.projects
       }
     })
@@ -149,8 +141,7 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
     }).
     success(function(response){
       if(response.error){
-        $scope.errorValue = true
-        $scope.errormessage = response.message
+        $scope.error = response.message
       }
       else{
         $scope.otherusers = response.data
@@ -163,8 +154,7 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
     }).
     success(function(response){
       if(response.error){
-        $scope.errorValue = true
-        $scope.errormessage = response.message
+        $scope.error = response.message
       }
       else{
         for(var i = 0; i<localStorageService.get('admin_projects').length; i++){
@@ -183,8 +173,7 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
     }).
     success(function(response){
       if(response.error){
-        $scope.errorValue = true
-        $scope.errormessage = response.message
+        $scope.error = response.message
       }
       else{
         $scope.users = response.data
@@ -198,8 +187,7 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
       }).
       success(function(response){
         if(response.error){
-          $scope.errorValue = true
-          $scope.errormessage = response.message
+          $scope.error = response.message
         }
         else{
           $scope.data = response.data
@@ -224,7 +212,6 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
       success(function(response){
         if(response.error){
           $scope.error = response.error;
-          $scope.errmessage = response.message;
         }
         else{
           $window.location.href = '/users/dashboard/adminprojects'
@@ -238,10 +225,8 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
         url: '/projects/acceptrequest/project/'+project_id+'/user/'+user_id+'/admin/'+localStorageService.get('user_info').user.user_id+'/'+decision
       }).
       success(function(response){
-        console.log(response)
         if(response.error){
           $scope.error = response.error;
-          $scope.errmessage = response.message;
         }
         else{
           $window.location.reload()
@@ -258,10 +243,8 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
       success(function(response){
         if(response.error){
           $scope.error = response.error;
-          $scope.errmessage = response.message;
         }
         else{
-          console.log(response)
           $window.location.reload()
         }
       })
@@ -275,15 +258,11 @@ app.controller('MemberProjectsCtrl', ['$scope', 'localStorageService', '$http', 
       url: '/users/getallprojects/'+$scope.username
     }).
     success(function(response){
-      console.log(response)
       if(response.error){
-        $scope.errorValue = true
-        $scope.errormessage = response.message
+        $scope.error = response.message
       }
       else{
-        //localStorageService.set('member_projects', response.projects)
         $scope.data = response.projects
-        console.log($scope.data)
       }
     })
 }])
@@ -294,20 +273,16 @@ app.controller('ProjectInvitesCtrl', ['$scope', 'localStorageService', '$http', 
       url: '/users/getinvites/user/'+localStorageService.get('user_info').user.user_id
     }).
     success(function(response){
-      console.log(response)
       if(response.error){
-        $scope.errorValue = true
-        $scope.errormessage = response.message
+        $scope.error = response.message
       }
       else{
-        //localStorageService.set('member_projects', response.projects)
         $scope.data = response.data
       }
     })
     
     $scope.acceptinvite = function(project_id, decision){
       var url = '/users/acceptinvite/project/'+project_id+'/'+localStorageService.get('user_info').user.user_id+'/'+decision
-      console.log(url)
       $http({
         method: 'PUT',
         url: url
@@ -331,10 +306,8 @@ app.controller('CreateProjectCtrl', ['$scope', 'localStorageService', '$http', '
         data: {title: $scope.project.title, description: $scope.project.description, branchname:$scope.project.branchname}
       }).
       success(function(response){
-        console.log(response)
         if(response.error){
-          $scope.error = response.error;
-          $scope.errmessage = response.message;
+          $scope.error = response.message;
         }
         else{
           $window.location.href = '/users/dashboard/adminprojects'
@@ -344,15 +317,14 @@ app.controller('CreateProjectCtrl', ['$scope', 'localStorageService', '$http', '
 }])
 
 app.controller('OtherProjectsCtrl', ['$scope', 'localStorageService', '$http', '$window', function($scope, localStorageService, $http, $window){
-  $scope.errorValue = false
   $http({
     method: 'GET',
     url: '/users/otherprojects/'+localStorageService.get('user_info').user.user_id
   }).
   success(function(response){
+    console.log(response)
     if(response.error){
-      $scope.errorValue = true
-      $scope.errormessage = response.message
+      $scope.error = response.message
     }
     else{
       $scope.projects = response.projects
@@ -368,8 +340,6 @@ app.controller('OtherProjectsCtrl', ['$scope', 'localStorageService', '$http', '
       console.log(response)
       if(response.error){
         $window.location.href = '/users/dashboard/otherprojects'
-        // $scope.errorValue = true
-        // $scope.errormessage = response.message
       }
       else{
         $window.location.href = '/users/dashboard/requestsent'
@@ -379,15 +349,13 @@ app.controller('OtherProjectsCtrl', ['$scope', 'localStorageService', '$http', '
 }])
 
 app.controller('RequestSentCtrl', ['$scope', '$http', 'localStorageService', function($scope, $http, localStorageService){
-  $scope.errorValue = false
   $http({
     method: 'GET',
     url: '/users/requestsent/'+localStorageService.get('user_info').user.user_id
   }).
   success(function(response){
     if(response.error){
-      $scope.errorValue = true
-      $scope.errormessage = response.message
+      $scope.error = response.message
     }
     else{
       $scope.data = response.projects
