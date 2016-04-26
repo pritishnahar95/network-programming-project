@@ -29,6 +29,14 @@ body {
   height : 50px !important;  
 }
 
+.small-ht{
+  height: 70px !important;
+}
+
+.med-ht{
+  height: 80px !important;
+}
+
 .list-group-item{
   height: 100px;  
 }
@@ -56,6 +64,15 @@ a {
 
 .explore{
   margin-left: 20px;
+}
+
+.btn{
+  margin-left: 10px;
+  line-height: 20px;
+}
+
+.x-small-ht{
+  height: 60px;
 }
 
 #content {

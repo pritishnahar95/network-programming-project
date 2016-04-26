@@ -2,21 +2,23 @@ extends layout
 
 block content
 	div(ng-controller="DashboardCtrl")
-		h4 Hi {{username}}
-		div(class="btn-group btn-group-justified" role="group")
-			div(class="btn-group" role="group")
-				a(type="button" class="btn btn-default", href="/users/dashboard/userdetails") Your Details
-			div(class="btn-group" role="group")
-				a(type="button" class="btn btn-default", href="/users/dashboard/adminprojects") Projects-Admin
-			div(class="btn-group" role="group")
-				a(type="button" class="btn btn-default", href="/users/dashboard/memberprojects") Projects-Member
-			div(class="btn-group" role="group")
-				a(type="button" class="btn btn-default", href="/users/dashboard/projectinvites") Invites Received
-			div(class="btn-group" role="group")
-				a(type="button" class="btn btn-default", href="/users/dashboard/requestsent") Request Sent
-			div(class="btn-group" role="group")
-				a(type="button" class="btn btn-default", href="/users/dashboard/otherprojects") Other Projects
-			div(class="btn-group" role="group")
-				a(type="button" class="btn btn-default", href="/users/dashboard/createproject") Create Project
+		h3 Hi {{username}}
+		
+		ul(class="nav nav-pills" role="tablist")
+			li(role="presentation")
+				a(href="/users/dashboard/userdetails") Your Details
+			li(role="presentation") 
+				a(href="/users/dashboard/adminprojects") Projects - Admin
+			li(role="presentation")
+				a(href="/users/dashboard/memberprojects") Projects - Member
+			li(role="presentation")
+				a(href="/users/dashboard/projectinvites") Invites Received
+			li(role="presentation")
+				a(href="/users/dashboard/requestsent") Request Sent
+			li(role="presentation")
+				a(href="/users/dashboard/otherprojects") Other Projects
+			li(role="presentation")
+				a(href="/users/dashboard/createproject") Create Project
+			
 		block dashboard-ui
 				

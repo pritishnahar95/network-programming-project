@@ -2,12 +2,17 @@ extends dashboard
 
 block dashboard-ui
 	div(ng-controller="ProjectInvitesCtrl")
-		h3 You have got invitation to join in these projects.
+		h4 You have got invitation to join these projects.
 		div(ng-show="errorValue") {{errormessage}}
-			
-		div(class='list-group' ng-repeat="project in data")
-			p(class="list-small list-group-item") Title : {{project.title}}
-			p(class="list-small list-group-item") Description : {{project.description}}
-			div(class ="list-small list-group-item btn-group inline")
-				button(class="btn btn-success" ng-click="acceptinvite(project.project_id, 1)") Accept
-				button(class="btn btn-success" ng-click="acceptinvite(project.project_id, 0)") Reject
+		div(class='list-group')
+			ul(class="list-group-item small-ht" ng-show="!errValue"  ng-repeat="project in data")
+				span(class ="btn-toobar right")
+					button(class="btn btn-success" ng-click="acceptinvite(project.project_id, 1)") Accept
+					button(class="btn btn-success" ng-click="acceptinvite(project.project_id, 0)") Reject
+				h4(class="list-group-item-heading") {{project.title}}
+				p(class="list-group-item-text") Description : {{project.description}}
+
+				
+					
+				
+	

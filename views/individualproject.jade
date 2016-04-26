@@ -2,10 +2,10 @@ extends layout
 
 block content
     div(ng-controller="IndProjectCtrl")
-        h3 Title : {{project.title}}
+        h3 {{project.title}}
         h4 Description : {{project.description}}
         h4 Admin : {{project.username}}
-        div(class="btn-group inline")
+        div(class="btn-toobar inline")
             button(class="btn btn-success" type="button" data-toggle="modal" ng-show="flag" data-target="#modal1") Create Notice
             div(class="modal fade" id="modal1" role="dialog")
                 div(class="modal-dialog")
@@ -48,16 +48,17 @@ block content
                                     hr
             hr
             
-            h4(ng-show="flag") Users Requesting to Join {{project.project_id}}
+            h4(ng-show="flag") Users requesting to join this project: 
                 div(ng-show="errorValue") {{errormessage}}
 
-                ul(ng-show="!errorValue" ng-repeat="user in users") 
-                    li {{user.username}}
-                        div(btn-group inline)
+                ul(class="list-group" ng-show="!errorValue" ng-repeat="user in users") 
+                    li(class="list-group-item x-small-ht") Username: {{user.username}}
+                        div(class="btn-toobar right")
                             button(class="btn btn-success" ng-click="acceptrequest(project.project_id, user.user_id, 1)") Accept
                             button(class="btn btn-success" ng-click="acceptrequest(project.project_id, user.user_id, 0)") Reject
                             
-            h4(ng-show="flag") Send invites to other users.
-                ul(ng-show="!errorValue" ng-repeat="user in otherusers") 
-                    li {{user.username}}
-                    button(class="btn btn-success" ng-click="inviteuser(user.user_id, project.project_id)") Send Invite
+            h4(ng-show="flag") Send invites to other users:
+                ul(class="list-group" ng-show="!errorValue" ng-repeat="user in otherusers") 
+                    li(class="list-group-item x-small-ht") Username: {{user.username}}
+                        div(class="btn-toobar right")
+                           button(class="btn btn-success" ng-click="inviteuser(user.user_id, project.project_id)") Send Invite
