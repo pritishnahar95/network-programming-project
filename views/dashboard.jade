@@ -3,22 +3,23 @@ extends layout
 block content
 	div(ng-controller="DashboardCtrl")
 		h3 Hi {{username}}
-		
-		ul(class="nav nav-pills" role="tablist")
-			li(role="presentation")
-				a(href="/users/dashboard/userdetails") Your Details
-			li(role="presentation") 
-				a(href="/users/dashboard/adminprojects") Projects - Admin
-			li(role="presentation")
-				a(href="/users/dashboard/memberprojects") Projects - Member
-			li(role="presentation")
-				a(href="/users/dashboard/projectinvites") Invites Received
-			li(role="presentation")
-				a(href="/users/dashboard/requestsent") Request Sent
-			li(role="presentation")
-				a(href="/users/dashboard/otherprojects") Other Projects
-			li(role="presentation")
-				a(href="/users/dashboard/createproject") Create Project
+		div(class="dashboard")
+			ul(class="nav nav-pills" role="tablist")
+				li(role="presentation")
+					a(href="/users/dashboard/userdetails") Your Details
+				li(role="presentation") 
+					a(href="/users/dashboard/adminprojects") Projects - Admin
+				li(role="presentation")
+					a(href="/users/dashboard/memberprojects") Projects - Member
+				li(role="presentation")
+					a(href="/users/dashboard/projectinvites") Invites Received
+				li(role="presentation")
+					a(href="/users/dashboard/requestsent") Request Sent
+				li(role="presentation")
+					a(href="/users/dashboard/otherprojects") Other Projects
+				li(role="presentation")
+					a(href="/users/dashboard/createproject") Create Project
+		hr
 			
 		block dashboard-ui
 				

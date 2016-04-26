@@ -46,6 +46,11 @@ body {
   margin-bottom: 50px;
 }
 
+.dashboard{
+    margin-left: 11%;
+    font-size: 16px;
+}
+
 .right{
   float: right;
 }
