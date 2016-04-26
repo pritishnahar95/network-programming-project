@@ -2,7 +2,6 @@ var express = require('express')
 var router = express.Router()
 var User = require('../models/user')
 var Project = require('../models/project')
-var _ = require('lodash')
 // get functions
 router.get('/dashboard', function(req, res){
   res.render('dashboard', {title:" | Dashboard"})
