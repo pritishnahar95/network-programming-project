@@ -266,7 +266,7 @@ module.exports = {
 	},
 	
 	otherprojects :function(user_id, callback){
-		var member_query = 'select m.user_id, m.project_id, u.username, p.title, p.description from (select * from member_schema where project_id not in (select project_id from member_schema where user_id='+user_id+')) m inner join user_schema u on u.user_id=m.user_id inner join project_schema p on p.project_id = m.project_id'
+		var member_query = 'select p.project_id, u.username,u.user_id, p.title, p.description from (select * from project_schema where project_id not in (select project_id from member_schema where user_id='+user_id+' UNION select project_id from request_schema where user_id='+user_id+')) p inner join member_schema m on m.project_id=p.project_id and m.admin_status=1 inner join user_schema u on u.user_id=m.user_id'
 		connection.query(member_query, function(err, projects){
 			if(err) callback(err, null)
 			else callback(null, projects)
@@ -287,5 +287,7 @@ module.exports = {
 			if(err) callback(err, null)
 			else callback(null, data)
 		})
-	}
+	},
+	
+
 };

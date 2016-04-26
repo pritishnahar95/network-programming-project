@@ -36,6 +36,10 @@ router.get('/dashboard/createproject', function(req, res){
   res.render('createproject', {title:" | Dashboard - Create Project"})
 })
 
+router.get('/page/admin/:admin_id/project/project_id/', function(req, res){
+  res.render('createproject', {title:" | Dashboard - Create Project"})
+})
+
 //User accepts/rejects project invite
 router.put('/acceptinvite/project/:projectid/:userid/:decision', function(req,res){
   var response = {}
@@ -115,17 +119,13 @@ router.get('/otherprojects/:userid', function(req, res){
     }
     else{
       otherprojects = projects
+      response = {error:false, message : 'Projects fetched successfully.', projects : projects};
     }
-    User.requestsent(user_id, function(err, projects){
-      if(err) response = {error : true, message : err.message}
-      else {
-        requestsent = projects
-        response = {error:false, message : 'Projects fetched successfully.', projects : _.differenceBy(otherprojects, requestsent, 'project_id')};
-      }
-      res.json(response)
-    })
+    res.json(response)
   })
 })
+
+
 
 router.get('/requestsent/:user_id', function(req, res){
   var response = {}

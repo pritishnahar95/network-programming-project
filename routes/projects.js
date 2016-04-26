@@ -145,6 +145,17 @@ router.post('/createnotice/user/:user_id/project/:project_id', function(req, res
   })
 })
 
+router.get('/page/otherusers/:project_id', function(req, res){
+  console.log(req.params.project_id)
+  var response = {}
+  var project_id = req.params.project_id
+  Project.otherusers(project_id, function(err, data){
+    console.log()
+    if(err) response = {error : true, message : err.message}
+    else response = {error : false, message : 'Users fetched successfully.', 'data' : data}
+    res.json(response)
+  })
+})
 //delete project----PENDING
 
 module.exports = router;

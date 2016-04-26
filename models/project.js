@@ -316,5 +316,15 @@ module.exports = {
 			if(err) callback(err, null)
 			else callback(null, data)
 		})
+	},
+	
+	// To get all users who are not in member_schema, request_schema corresponding to a project_id
+	otherusers: function(project_id, callback){
+		var query = 'SELECT username, user_id FROM user_schema WHERE user_id NOT IN (SELECT user_id FROM member_schema WHERE project_id = '+project_id+' UNION SELECT user_id FROM request_schema WHERE project_id = '+project_id+')'
+		connection.query(query, function(err, data){
+			console.log(data)
+			if(err) callback(err, null)
+			else callback(null, data)
+		})
 	}
 };	
