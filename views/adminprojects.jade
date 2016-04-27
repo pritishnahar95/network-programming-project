@@ -2,10 +2,11 @@ extends dashboard
 
 block dashboard-ui
 	div(ng-controller="AdminProjectsCtrl")
-		h4 Projects in which you have admin rights.
-		p {{error}}
-		div(class='list-group')
-			ul(class="list-group-item small-ht" ng-repeat="project in data") 
+			h4 Projects in which you have admin rights.
+			p {{error}}
+			input(type="text" class="form-control" placeholder="Search by project title" aria-describedby="basic-addon1" ng-model="test")
+			div(class='list-group')
+			ul(class="list-group-item small-ht" ng-repeat="project in data | filter : test") 
 				a(href="/projects/details/{{project.project_id}}" class="list-group-item-heading") {{project.title}}
 				p(class="list-group-item-text") Description: {{project.description}}
 			

@@ -22,7 +22,7 @@ block content
                                 div(class='form-group')
                                     label(class='control-label col-sm-2',for='content') Content:
                                     div(class='col-sm-10')
-                                        textarea(class='form-control' name='content', ng-model="notice.content" type='text',id='content', required)
+                                        textarea(class='form-control' name='content', ng-model="notice.content" type='text', required)
                                         span(style="color:red", ng-show="noticeform.content.$dirty && noticeform.content.$invalid")
                                             span(ng-show="noticeform.content.$error.required") Content is required.
                                         
@@ -43,22 +43,22 @@ block content
                             h4(class="modal-title") Notices
                         div(class="modal-body")
                             div(class='list-group')
-                                ul(class="list-group-item" ng-repeat="notice in data") 
+                                ul(class="list-group-item small-ht" ng-repeat="notice in data") 
                                     p(class="list-group-item-text") {{notice.content}}
-                                    hr
             hr
-            
             h4(ng-show="flag") Users requesting to join this project: 
                 div(ng-show="errorValue") {{errormessage}}
-
-                ul(class="list-group" ng-show="!errorValue" ng-repeat="user in users") 
+                input(type="text" class="form-control" placeholder="Search by username" aria-describedby="basic-addon1" ng-model="test")
+                ul(class="list-group" ng-show="!errorValue" ng-repeat="user in users | filter : test") 
                     li(class="list-group-item x-small-ht") Username: {{user.username}}
                         div(class="btn-toobar right")
                             button(class="btn btn-success" ng-click="acceptrequest(project.project_id, user.user_id, 1)") Accept
                             button(class="btn btn-success" ng-click="acceptrequest(project.project_id, user.user_id, 0)") Reject
                             
+            hr
             h4(ng-show="flag") Send invites to other users:
-                ul(class="list-group" ng-show="!errorValue" ng-repeat="user in otherusers") 
+                input(type="text" class="form-control" placeholder="Search by username" aria-describedby="basic-addon1" ng-model="test")
+                ul(class="list-group" ng-show="!errorValue" ng-repeat="user in otherusers | filter : test") 
                     li(class="list-group-item x-small-ht") Username: {{user.username}}
                         div(class="btn-toobar right")
                            button(class="btn btn-success" ng-click="inviteuser(user.user_id, project.project_id)") Send Invite

@@ -72,7 +72,6 @@ router.put('/sendrequest/:username/project/:projectpk', function(req,res){
     else{
       response = {'error' : false, 'message' : "Request sent to admin successfully."}
     }
-    console.log(response)
     res.json(response)
   })
 })
