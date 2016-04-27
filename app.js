@@ -33,34 +33,35 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 
 app.use(function(req, res, next) {
-  var token = req.headers.cookie.split("=")[1];
-  //console.log(token)
-  // decode token
-  if (token) {
-    // verifies secret and checks exp
-    jwt.verify(token, "qwerty", function(err, decoded) {      
-      if (err) {
-        return res.json({ success: false, message: 'Failed to authenticate token.' });    
-      } else {
-        var userid = jwt.decode(token)
-        var query = 'SELECT * FROM user_schema where user_id=' +  userid
-        connection.query(query, function(err, data){
-          if(err) res.json({ success: false, message: 'Database connection error.'});
-          else if(data.length == 0) res.json({ success: false, message: 'No user found.'});
-          else next()
-        }) 
-      }
-    });
+  if(req.headers.cookie == undefined) res.render('error', {message: 'No token provided. Please login.'})
+  else{
+    var token = req.headers.cookie.split("=")[1];
+    if (token) {
+      // verifies secret and checks exp
+      jwt.verify(token, "qwerty", function(err, decoded) {      
+        if (err) {
+          return res.render('error', { success: false, title: " | Error", message: 'Failed to authenticate token.' });    
+        } else {
+          var userid = jwt.decode(token)
+          var query = 'SELECT * FROM user_schema where user_id=' +  userid
+          connection.query(query, function(err, data){
+            if(err) res.render('error', { success: false, message: 'Database connection error.'});
+            else if(data.length == 0) res.render('error', { success: false, message: 'No user found.'});
+            else next()
+          }) 
+        }
+      });
 
-  } else {
-    
-    // if there is no token
-    // return an error
-    return res.status(403).send({ 
-        error: true, 
-        message: 'No token provided.' 
-    });
-    
+    } else {
+      
+      // if there is no token
+      // return an error
+      return res.status(403).send({ 
+          error: true, 
+          message: 'No token provided.' 
+      });
+      
+    }
   }
 });
 
