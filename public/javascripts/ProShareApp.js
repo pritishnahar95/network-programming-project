@@ -256,6 +256,23 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
       })   
     }
     
+    $scope.deletefile = function(project_id, file){
+      console.log("here")
+      $http({
+        method: 'POST',
+        url: '/projects/deletefile/'+$location.url().split("/")[3],
+        data: {filename: file}
+      }).
+      success(function(response){
+        if(response.error){
+          $scope.error = response.message
+        }
+        else{
+          $window.location.reload()
+        }
+      })
+    }
+    
     $scope.shownotices = function(){
       $http({
         method: 'GET',

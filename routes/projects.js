@@ -191,6 +191,15 @@ router.get('/getfiles/:project_id', function(req, res){
     res.json(response)
   })
 })
+
+router.post('/deletefile/:project_id', function(req, res){
+  fs.unlink('./uploads/'+req.params.project_id+'/'+req.body.filename, function(err){
+    if(err) response = {error : true, message : err.message}
+    else response = {error : false, message : 'File deleted successfully.'}
+    console.log('-----')
+    res.json(response)
+  })
+})
 //delete project----PENDING
 
 module.exports = router;

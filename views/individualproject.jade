@@ -65,6 +65,7 @@ block content
                             div(class='list-group')
                                 ul(class="list-group-item x-small-ht" ng-repeat="file in data") 
                                     a(href="/projects/download/{{project.project_id}}/{{file}}" download="{{file}}" target="_blank") {{file}}
+                                    button(class="btn btn-danger btn-sm" ng-show="flag" ng-click="deletefile(project.project_id,file)") Delete
 
             hr(ng-show="flag")
             h4(ng-show="flag") Users requesting to join this project: 
