@@ -3,20 +3,46 @@ var router = express.Router()
 var Project = require('../models/project')
 var User = require('../models/user')
 var connection = require('../config/db').connection;
+var mkdirp = require('mkdirp');
+var multer  = require('multer')
+var fs = require('fs')
 
-// middleware
-// router.use(function(req, res, next){
-//   var username = req.params.username || req.body.username;
-//   console.log(req.params)
-//   console.log(req.body)
-//   var query = 'SELECT * FROM user_schema where username=' + "'" + username +"'"
-//   connection.query(query, function(err, user){
-//     console.log(user)
-//     if(err) res.status(400).json({error : true, message : 'Database connection error'})
-//     else if(user.length == 0) res.status(400).json({error : true, message : 'User not found in database.'})
-//     else next();
-//   })
-// })
+router.post('/upload/:project_id', multer({ storage: multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './uploads/'+req.params.project_id)
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    }
+  }) 
+}).single('file'),function(req, res){
+    console.log("here")
+    console.log(req.body)
+    console.log(req.file)
+    res.status(204).end()
+});
+
+router.post('/mkdir/:project_id', function(req, res){
+    console.log("here")
+    mkdirp('./uploads/'+req.params.project_id, function (err) {
+        if (err) {
+          console.error(err)
+          res.json({'error' : true, 'message' : 'Error occurred.'}) 
+        }
+        else {
+          console.log('pow!')
+          res.json({'error' : false, 'message' : 'Folder created succesfully on the server.'})
+      }
+    }); 
+})
+
+router.get('/download/:project_id/:filename', function(req, res){
+  res.download('./uploads/'+req.params.project_id+'/'+req.params.filename);
+});
+
+// router.get('/fileupload/', function(req, res) {
+//   res.render('fileupload', {title:" | fileupload"});
+// });
 
 router.get('/details/:project_id', function(req, res){
   res.render('individualproject', {title:" | Project Page"})
@@ -56,10 +82,12 @@ router.post('/create/:username', function(req, res){
   if(s === "Mech") branch_id=3
   if(s === "Chem") branch_id=4
   Project.create_project(req.body, branch_id, username, function(err, projectid){
+    console.log(err)
     if(err){
       response = {'error' : true, 'message' : err.message}
     }
     else {
+      console.log(projectid)
       response = {'error' : false, 'message' : "Project created successfully."}
     }
     res.json(response)
@@ -151,6 +179,15 @@ router.get('/page/otherusers/:project_id', function(req, res){
   Project.otherusers(project_id, function(err, data){
     if(err) response = {error : true, message : err.message}
     else response = {error : false, message : 'Users fetched successfully.', 'data' : data}
+    res.json(response)
+  })
+})
+
+router.get('/getfiles/:project_id', function(req, res){
+  console.log(req.params.project_id)
+  fs.readdir('./uploads/'+req.params.project_id, function(err, files){
+    if(err) response = {error : true, message : err.message}
+    else response = {error : false, message : 'Files fetched successfully.', 'data' : files}
     res.json(response)
   })
 })

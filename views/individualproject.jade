@@ -5,6 +5,14 @@ block content
         h3 {{project.title}}
         h4 Description : {{project.description}}
         h4 Admin : {{project.username}}
+        hr
+        div(ng-show="flag")
+            h4 Upload Files :
+            label(class="btn btn-success" for="file-selector")
+                input(id="file-slector" type="file" class="file" name="file" file-model="myFile")
+            button(class="btn btn-success" ng-click="uploadFile()") Upload
+            h4 {{errormessage}}
+            hr
         div(class="btn-toobar inline")
             button(class="btn btn-success" type="button" data-toggle="modal" ng-show="flag" data-target="#modal1") Create Notice
             div(class="modal fade" id="modal1" role="dialog")
@@ -45,20 +53,33 @@ block content
                             div(class='list-group')
                                 ul(class="list-group-item small-ht" ng-repeat="notice in data") 
                                     p(class="list-group-item-text") {{notice.content}}
-            hr
+                                    
+            button(class="btn btn-success" type="button" data-toggle="modal" data-target="#modal3" ng-click="showfiles(project.project_id)") Show Files
+            div(class="modal fade" id="modal3" role="dialog")
+                div(class="modal-dialog")
+                    div(class="modal-content")
+                        div(class="modal-header")
+                            button(type="button" class="close" data-dismiss="modal") &times;
+                            h4(class="modal-title") Files
+                        div(class="modal-body")
+                            div(class='list-group')
+                                ul(class="list-group-item x-small-ht" ng-repeat="file in data") 
+                                    a(href="/projects/download/{{project.project_id}}/{{file}}" download="{{file}}" target="_blank") {{file}}
+
+            hr(ng-show="flag")
             h4(ng-show="flag") Users requesting to join this project: 
                 div(ng-show="errorValue") {{errormessage}}
-                input(type="text" class="form-control" placeholder="Search by username" aria-describedby="basic-addon1" ng-model="test")
-                ul(class="list-group" ng-show="!errorValue" ng-repeat="user in users | filter : test") 
+                //input(type="text" class="form-control" placeholder="Search by username" aria-describedby="basic-addon1" ng-model="test1")
+                ul(class="list-group" ng-show="!errorValue" ng-repeat="user in users") 
                     li(class="list-group-item x-small-ht") Username: {{user.username}}
                         div(class="btn-toobar right")
                             button(class="btn btn-success" ng-click="acceptrequest(project.project_id, user.user_id, 1)") Accept
                             button(class="btn btn-success" ng-click="acceptrequest(project.project_id, user.user_id, 0)") Reject
                             
-            hr
+            hr(ng-show="flag")
             h4(ng-show="flag") Send invites to other users:
-                input(type="text" class="form-control" placeholder="Search by username" aria-describedby="basic-addon1" ng-model="test")
-                ul(class="list-group" ng-show="!errorValue" ng-repeat="user in otherusers | filter : test") 
-                    li(class="list-group-item x-small-ht") Username: {{user.username}}
+                input(type="text" class="form-control" placeholder="Search by name" aria-describedby="basic-addon1" ng-model="test2")
+                ul(class="list-group" ng-show="!errorValue" ng-repeat="user in otherusers | filter : test2") 
+                    li(class="list-group-item x-small-ht") {{user.firstname}} {{user.lastname}}
                         div(class="btn-toobar right")
                            button(class="btn btn-success" ng-click="inviteuser(user.user_id, project.project_id)") Send Invite

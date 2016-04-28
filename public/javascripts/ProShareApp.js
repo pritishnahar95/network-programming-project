@@ -5,6 +5,39 @@ var app = angular.module('ProShareApp', ['LocalStorageModule'], function($locati
   });
 });
 
+app.directive('fileModel', ['$parse', function ($parse) {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+            var model = $parse(attrs.fileModel);
+            var modelSetter = model.assign;
+            
+            element.bind('change', function(){
+                scope.$apply(function(){
+                    modelSetter(scope, element[0].files[0]);
+                });
+            });
+        }
+    };
+}]);
+
+app.service('fileUpload', ['$http','$window', function ($http, $window) {
+    this.uploadFileToUrl = function(file, uploadUrl){
+        var fd = new FormData();
+        fd.append('file', file);
+        $http.post(uploadUrl, fd, {
+            transformRequest: angular.identity,
+            headers: {'Content-Type': undefined}
+        })
+        .success(function(){
+          $window.location.reload()
+        })
+        .error(function(){
+          console.log("error in uploading")
+        });
+    }
+}]);
+
 app.config(function (localStorageServiceProvider) {
   localStorageServiceProvider
     .setPrefix('ProSharePrefix');
@@ -134,7 +167,7 @@ app.controller('AdminProjectsCtrl', ['$scope', 'localStorageService', '$http', f
 }])
 
 
-app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$location', '$window', function($scope, localStorageService, $http, $location, $window){
+app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$location', '$window', 'fileUpload', function($scope, localStorageService, $http, $location, $window, fileUpload){
     $http({
       method: 'GET',
       url: '/projects/page/otherusers/'+$location.url().split("/")[3]
@@ -179,6 +212,49 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
         $scope.users = response.data
       }
     })
+    
+    $scope.uploadFile = function(){
+        $http({
+          method: 'POST',
+          url: '/projects/mkdir/'+$location.url().split("/")[3]
+        }).
+        success(function(response){
+          console.log(response)
+          if(response.error){
+            console.log(response)
+          }
+          else{
+            var file = $scope.myFile;
+            var uploadUrl = "/projects/upload/"+$location.url().split("/")[3];
+            fileUpload.uploadFileToUrl(file, uploadUrl);
+          }
+        })
+    };
+    
+    $scope.showfiles = function(project_id){
+      $http({
+        method: 'GET',
+        url: '/projects/getfiles/'+$location.url().split("/")[3]
+      }).
+      success(function(response){
+          if(response.error){
+            console.log(response)
+          }
+          else{
+            $scope.data = response.data
+          }
+      })
+    }
+    
+    $scope.download = function(){
+      $http({
+        method: 'GET',
+        url: '/download'
+      }).
+      success(function(response){
+        console.log(response)
+      })   
+    }
     
     $scope.shownotices = function(){
       $http({
