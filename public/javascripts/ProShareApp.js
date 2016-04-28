@@ -241,7 +241,7 @@ app.controller('IndProjectCtrl', ['$scope', 'localStorageService', '$http', '$lo
             console.log(response)
           }
           else{
-            $scope.data = response.data
+            $scope.data1 = response.data
           }
       })
     }

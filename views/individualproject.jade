@@ -63,7 +63,7 @@ block content
                             h4(class="modal-title") Files
                         div(class="modal-body")
                             div(class='list-group')
-                                ul(class="list-group-item x-small-ht" ng-repeat="file in data") 
+                                ul(class="list-group-item x-small-ht" ng-repeat="file in data1") 
                                     a(href="/projects/download/{{project.project_id}}/{{file}}" download="{{file}}" target="_blank") {{file}}
                                     button(class="btn btn-danger btn-sm" ng-show="flag" ng-click="deletefile(project.project_id,file)") Delete
 
